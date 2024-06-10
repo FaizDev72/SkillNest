@@ -6,11 +6,6 @@ const courseSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
-    instructor: {
-        type: String,
-        required: true,
-        trim: true,
-    },
     description: {
         type: String,
         required: true,
@@ -26,6 +21,14 @@ const courseSchema = new mongoose.Schema({
     },
     thumbnail: {
         type: String,
+        required: true,
+    },
+    tag: {
+        type: [String],
+    },
+    instructor: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true,
     },
     student_enrolled: [{
@@ -48,8 +51,6 @@ const courseSchema = new mongoose.Schema({
         ref: "ReviewAndRating",
         required: true
     }],
-
-
 });
 
 

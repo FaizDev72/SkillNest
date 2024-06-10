@@ -14,6 +14,9 @@ const profileSchema = new mongoose.Schema({
     },
     profession: {
         type: String,
+    },
+    about: {
+        type: String,
     }
     // For Future Scope
     // address: [

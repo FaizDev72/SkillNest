@@ -5,15 +5,15 @@ const categorySchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
+    },    
+    category_desc : {
+        type: String,
     },
     courses: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Course",
         required: true
     }],
-    category_desc : {
-        type: String,
-    }
 
 });
 
