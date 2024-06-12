@@ -7,14 +7,21 @@ require('dotenv').config();
 exports.createSubSection = async (req, res) => {
     try {
         // Fetching Data 
-        const { sub_section_name, section_id, sub_sec_desc, duration } = req.body;
+        const { sub_section_name, section_id, sub_section_desc, duration } = req.body;
         const video = req.files.videoFile;
 
         // Validating Data
-        if (!sub_section_name || !section_id || !sub_sec_desc || !duration) {
+        if (!sub_section_name || !section_id || !sub_section_desc || !duration) {
             return res.status(400).json({
                 success: false,
                 message: 'Missing required properties'
+            });
+        }
+
+        if(! await Section.findById(section_id)){
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid Section Id'
             });
         }
 
@@ -23,22 +30,22 @@ exports.createSubSection = async (req, res) => {
 
         // create section
         const subSection = await SubSection.create({
-            sub_seciton_name,
+            sub_section_name,
             sub_section_desc,
             duration,
             video: videoUrl.secure_url,
         })
 
-        // update courses section field
+        // update sections subsection field
         const section = await Section.findByIdAndUpdate({ _id: section_id }, {
-            $push: { section: subSection._id }
+            $push: { sub_section: subSection._id }
         }, { new: true }).populate("sub_section")
-
+        
         //return updated section object in response
         return res.status(200).json({
             success: true,
-            message: 'Section Created Successfully',
-            section,
+            message: 'Sub Section Created Successfully',
+            subSection,
         })
 
     } catch (error) {
@@ -57,7 +64,7 @@ exports.updateSubSection = async (req, res) => {
         const { sub_section_name, sub_section_id, sub_section_desc } = req.body;
 
         // Validating Data
-        if (!sub_section_name || !sub_section_id || sub_section_desc) {
+        if (!sub_section_name || !sub_section_id || !sub_section_desc) {
             return res.status(400).json({
                 success: false,
                 message: 'Missing Properties'
@@ -65,7 +72,7 @@ exports.updateSubSection = async (req, res) => {
         }
 
         // update sub-section
-        const subSection = await Section.findByIdAndUpdate(sub_section_id, { sub_section_name, sub_section_desc },
+        const subSection = await SubSection.findByIdAndUpdate(sub_section_id, { sub_section_name, sub_section_desc },
             { new: true },
         );
 
@@ -87,8 +94,8 @@ exports.updateSubSection = async (req, res) => {
 // Delete Section
 exports.deleteSubSection = async (req, res) => {
     try {
-        const sub_section_id = req.sub_section.id
-
+        const {sub_section_id} = req.body
+        console.log(sub_section_id)
         // Validating  Data
         if (!sub_section_id) {
             return res.status(400).json({
@@ -98,7 +105,7 @@ exports.deleteSubSection = async (req, res) => {
         }
 
         // Delete
-        await Section.findByIdAndDelete(sub_section_id);
+        await SubSection.findByIdAndDelete(sub_section_id);
 
         return res.status(200).json({
             success: true,

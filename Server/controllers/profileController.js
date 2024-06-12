@@ -77,7 +77,8 @@ exports.deleteAccount = async (req, res) => {
 exports.getUserByID = async (req, res) => {
     try {
         const user_id = req.user.id;
-        const userDetails = await User.findById(user_id).populate("profile").exec();
+        console.log(user_id)
+        const userDetails = await User.findById(user_id).populate("profile").populate("courses").exec();
         return res.status(200).json({
             success: true,
             message: 'User Data Fetched Successfully',
@@ -97,8 +98,10 @@ exports.getUserByID = async (req, res) => {
 exports.updateUserImage = async (req, res) => {
     try {
         // Getting user details
-        const { user_id } = req.body;
+        const  user_id  = req.user.id;
         const image = req.files.imageFile;
+        console.log(user_id)
+        console.log(req.body)
 
         // Fetching User data and Validating
         const user = await User.findById(user_id);
@@ -117,7 +120,7 @@ exports.updateUserImage = async (req, res) => {
         const newImageUrl = await uploadImagetoCloudinary(image, process.env.CLOUD_FOLDER, 1000)
 
         //Update image of user in profile schema
-        await Profile.findByIdAndUpdate(user.profile, { image: newImageUrl.secure_url }, { new: true });
+        const updatedProfile = await Profile.findByIdAndUpdate(user.profile, { image: newImageUrl.secure_url }, { new: true });
 
         // return
         res.send({
@@ -127,6 +130,7 @@ exports.updateUserImage = async (req, res) => {
         });
 
     } catch (error) {
+        console.log(error)
         return res.status(500).json({
             success: false,
             message: error.message,

@@ -13,9 +13,9 @@ exports.sendMail = async (sendTo, subject, body) => {
 
         const info = await transporter.sendMail({
             from: "SkillNest - EdTech Platform for Learning Coding",
-            to: sendTo,
-            subject: subject,
-            html: body
+            to: `${sendTo}`,
+            subject: `${subject}`,
+            html: `${body}`
         })
 
         console.log("Email Information ", info)

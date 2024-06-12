@@ -17,7 +17,7 @@ exports.uploadImagetoCloudinary = async (file, folder, height, quality) => {
 exports.destoryImageFromCloudinary = async (public_id) => {
     try {
         const options = {
-            resource_type: auto,
+            resource_type: "auto",
         }
         const result = await cloudinary.uploader.destroy(public_id, options);
         console.log('Asset destroyed:', result);

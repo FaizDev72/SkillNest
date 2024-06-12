@@ -5,8 +5,9 @@ const OTP = require('../models/OTP')
 const jwt = require('jsonwebtoken')
 const { sendMail } = require('../utils/sendMail')
 require('dotenv').config();
+const bcrypt = require('bcrypt')
 
-exports.sendOtpController = async (req, res) => {
+exports.sendOtp = async (req, res) => {
     try {
         // Getting data from request body
         const { email } = req.body;
@@ -30,14 +31,15 @@ exports.sendOtpController = async (req, res) => {
         }
 
         // generate Otp
-        const otp = otpGenerator.generate(6, {
+        let otp = otpGenerator.generate(6, {
             upperCaseAlphabets: false,
             lowerCaseAlphabets: false,
             specialChars: false
         })
+        console.log(otp)
 
         otpList = await User.find({ otp })
-        const flag = true;
+        let flag = true;
         while (flag) {
             if (otpList.includes(otp)) {
                 otp = otpGenerator.generate(6, {
@@ -50,11 +52,13 @@ exports.sendOtpController = async (req, res) => {
             }
         }
 
-        // Update Otp in DB
-        await OTP.create({
+        // Insert Otp in DB
+        const otpDetails = await OTP.create({
             email,
             otp,
         })
+
+        // console.log(otpDetails)
 
         // Return response 
         return res.status(200).json({
@@ -63,7 +67,7 @@ exports.sendOtpController = async (req, res) => {
             otp
         })
     } catch (error) {
-        console.log(error.message);
+        console.log(error);
         return res.status(500).json({
             success: false,
             message: error.message,
@@ -71,16 +75,17 @@ exports.sendOtpController = async (req, res) => {
     }
 }
 
-exports.signupController = async (req, res) => {
+exports.signup = async (req, res) => {
     try {
         // Getting request data from body
         let { first_name, last_name, email, password, confirm_password, otp, phone_no, account_type } = req.body;
+        console.log({ first_name, last_name, email, password, confirm_password, otp, phone_no, account_type })
 
         // Validating the Data
         if (!first_name || !last_name || !email || !password || !confirm_password || !otp || !phone_no) {
             return res.status(400).json({
                 success: false,
-                message: 'Empty email field'
+                message: 'Empty Field'
             })
         }
 
@@ -103,9 +108,10 @@ exports.signupController = async (req, res) => {
         }
 
         // Get lastest form db 
-        const lastestOtp = OTP.findOne(email).sort({ createdAt: -1 }).limit(1);
+        const lastestOtp = await OTP.find({email}).sort({ created_at: -1 }).limit(1);
+        console.log(lastestOtp)
 
-        if (lastestOtp != otp) {
+        if (lastestOtp[0].otp != otp) {
             return res.status(400).json({
                 success: false,
                 message: 'Incorrect Otp',
@@ -129,7 +135,7 @@ exports.signupController = async (req, res) => {
         })
 
         // Create user into db
-        const updateUser = User.create({
+        const updateUser = await User.create({
             first_name,
             last_name,
             email,
@@ -179,7 +185,7 @@ exports.login = async (req, res) => {
         }
 
         // compare password
-        if (await bcrypt.compare(password, isEmailExists.password)) {
+        if (await bcrypt.compare(password, user.password)) {
             // create jwt token
             const payload = {
                 email: user.email,

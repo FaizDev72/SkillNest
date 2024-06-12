@@ -7,7 +7,7 @@ const OTPSchema = new mongoose.Schema({
     },
     created_at: {
         type: Date,
-        default: Date.now(),
+        default: Date.now,
         expires: 60 * 5,
     },
     email: {
@@ -19,6 +19,7 @@ const OTPSchema = new mongoose.Schema({
 
 OTPSchema.pre("save", async function (next) {
     await sendMail(this.email, "Otp verification mail", this.otp)
+    next();
 })
 
 

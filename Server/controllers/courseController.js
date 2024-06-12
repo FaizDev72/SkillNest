@@ -1,14 +1,18 @@
 const Category = require("../models/Category");
 const Course = require("../models/Course");
 const User = require("../models/User");
+const { uploadImagetoCloudinary } = require("../utils/cloudinaryAssetsHandlers");
+
 
 // Create Courses
 exports.createCourse = async (req, res) => {
     try {
         // Fetching Data
-        const { course_name, instructor, description, price, course_learning, tag, category } = req.body;
+        const { course_name, description, price, course_learning, tag, category } = req.body;
+        const instructor = req.user.id;
 
         const thumbnail = req.files.thumbnail
+        console.log({ course_name, instructor, description, price, course_learning, tag, category, thumbnail })
 
         // Validate
         if (!course_name || !instructor || !description || !price || !course_learning || !tag || !category) {
@@ -22,7 +26,7 @@ exports.createCourse = async (req, res) => {
         const thumbnailUrl = await uploadImagetoCloudinary(thumbnail, process.env.CLOUD_FOLDER);
 
         // Insert Data
-        const course = await Course.create({
+        const newCourse = await Course.create({
             course_name,
             description,
             price,
@@ -32,6 +36,9 @@ exports.createCourse = async (req, res) => {
             instructor,
             category
         });
+
+        // Fetch the newly created course and populate the category field
+        const course = await Course.findById(newCourse._id).populate('category');
 
         // adding new course to user schema
         await User.findByIdAndUpdate(
@@ -119,7 +126,7 @@ exports.getCourseById = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "Course Details Fetched Successfully",
-            data: courseDetails,
+            data: course,
         });
     } catch (error) {
         console.log(error);

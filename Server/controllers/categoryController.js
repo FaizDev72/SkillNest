@@ -6,6 +6,7 @@ exports.createCategory = async (req, res) => {
     try {
         // get data
         const { category_name, category_desc } = req.body;
+        console.log({ category_name, category_desc })
 
         // validate
         if (!category_name || !category_desc) {
@@ -33,12 +34,12 @@ exports.createCategory = async (req, res) => {
 // get all Category
 exports.getAllCategory = async (req, res) => {
     try {
-        const allCategory = await Category.find({}, { name: true, description: true });
+        const allCategory = await Category.find({}).populate("courses");
 
         res.status(200).json({
             success: true,
             message: "All tags returned successfully",
-            data: allCategories,
+            data: allCategory,
         })
     } catch (error) {
 
@@ -50,14 +51,14 @@ exports.getPageDetails = async (req, res) => {
     try {
         // get data from request body
         const { category_id } = req.body;
-
+        console.log(category_id)
 
         // get courses of category
-        const category = await Category.findById(category_id)
+        const selectedCategory = await Category.findById(category_id)
             .populate("courses").exec();
 
         // validating data
-        if (!category) {
+        if (!selectedCategory) {
             return res.status(404).json({
                 success: false,
                 message: "Data Not Found",

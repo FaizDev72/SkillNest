@@ -6,6 +6,7 @@ exports.createSection = async (req, res) => {
     try {
         // Fetching Data 
         const { section_name, course_id } = req.body;
+        console.log({ section_name, course_id })
 
         // Validating Data
         if (!section_name || !course_id) {
@@ -16,11 +17,11 @@ exports.createSection = async (req, res) => {
         }
 
         // create section
-        const section = await Section.create(section_name)
+        const section = await Section.create({ section_name })
 
         // update courses section field
-        const course = await Course.findByIdAndUpdate({ _id: course_id }, {
-            $push: { section: section._id }
+        const updatedCourseDetails = await Course.findByIdAndUpdate({ _id: course_id }, {
+            $push: { course_content: section._id }
         }, { new: true }).populate({
             path: "course_content",
             populate: {
@@ -59,7 +60,7 @@ exports.updateSection = async (req, res) => {
         }
 
         // update section
-        const section = await Section.findByIdAndUpdate(section_id, section_name,
+        const section = await Section.findByIdAndUpdate(section_id, { section_name },
             { new: true },
         );
 
@@ -82,10 +83,12 @@ exports.updateSection = async (req, res) => {
 // Delete Section
 exports.deleteSection = async (req, res) => {
     try {
-        const section_id = req.section.id
+        const {section_id} = req.body
+
+        console.log(section_id)
 
         // Validating  Data
-        if (!ection_id) {
+        if (!section_id) {
             return res.status(400).json({
                 success: false,
                 message: 'Missing Properties'
@@ -102,7 +105,12 @@ exports.deleteSection = async (req, res) => {
 
 
     } catch (error) {
-
+        console.log("Error while deleting section", error);
+        return res.status(500).json({
+            success: false,
+            message: 'Unable to delete Section, please try again',
+            error: error.message,
+        })
     }
 }
 
