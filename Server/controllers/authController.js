@@ -78,11 +78,11 @@ exports.sendOtp = async (req, res) => {
 exports.signup = async (req, res) => {
     try {
         // Getting request data from body
-        let { first_name, last_name, email, password, confirm_password, otp, phone_no, account_type } = req.body;
-        console.log({ first_name, last_name, email, password, confirm_password, otp, phone_no, account_type })
+        let { first_name, last_name, email, password, confirm_password, otp, account_type } = req.body;
+        console.log({ first_name, last_name, email, password, confirm_password, otp, account_type })
 
         // Validating the Data
-        if (!first_name || !last_name || !email || !password || !confirm_password || !otp || !phone_no) {
+        if (!first_name || !last_name || !email || !password || !confirm_password || !otp) {
             return res.status(400).json({
                 success: false,
                 message: 'Empty Field'
@@ -140,7 +140,6 @@ exports.signup = async (req, res) => {
             last_name,
             email,
             password: hashedPassword,
-            phone_no,
             account_type,
             approved,
             profile: profile.id

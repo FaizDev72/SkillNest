@@ -6,8 +6,8 @@ const FooterLinkBlocks = ({ heading, Links }) => {
             <h4 className='text-richblack-50 font-semibold text-[16px]'>{heading}</h4>
             <ul className='flex flex-col gap-2 items-start '>
                 {
-                    Links.map((link) => (
-                        <li className='text-[14px] cursor-pointer hover:text-richblack-50 transition-all duration-200'>
+                    Links.map((link, index) => (
+                        <li key={index} className='text-[14px] cursor-pointer hover:text-richblack-50 transition-all duration-200'>
                             <Link to={link.toLowerCase().replace(" ", "-")}>
                                 {link}
                             </Link>

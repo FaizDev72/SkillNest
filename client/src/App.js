@@ -4,6 +4,10 @@ import './App.css';
 import Navbar from "./components/common/Navbar";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Footer from "./components/common/Footer";
+import Category from "./pages/Category";
+import CourseDetails from "./pages/CourseDetails";
+import VerifyEmail from "./pages/VerifyEmail";
 
 function App() {
   return (
@@ -12,15 +16,17 @@ function App() {
       {/* <div className="w-11/12 mx-auto overflow-hidden"> */}
       <Routes>
         <Route path='/' element={<Home />} />
-        {/* <Route path='/catalog' element={<Home/>}/>
-      <Route path='/about' element={<Home/>}/>
-      <Route path='/contact' element={<Home/>}/> */}
+        <Route path='/catalog/:catalog_name' element={<Category />} />
 
-      <Route path="/login" element={<Login/>}/>
-      <Route path="/signup" element={<Signup/>}/>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
+
+        <Route path="/courses/:course_id" element={<CourseDetails />} />
       </Routes>
 
       {/* </div> */}
+      <Footer />
     </div>
 
   );

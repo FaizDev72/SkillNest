@@ -158,7 +158,7 @@ const Home = () => {
             {/* Instruction Section */}
             <InstructorSection />
             
-            <Footer/>
+            
 
         </div>
     )

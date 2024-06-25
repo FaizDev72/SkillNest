@@ -50,11 +50,11 @@ exports.getAllCategory = async (req, res) => {
 exports.getPageDetails = async (req, res) => {
     try {
         // get data from request body
-        const { category_id } = req.body;
-        console.log(category_id)
+        const { categoryId } = req.body;
+        console.log(categoryId)
 
         // get courses of category
-        const selectedCategory = await Category.findById(category_id)
+        const selectedCategory = await Category.findById(categoryId)
             .populate("courses").exec();
 
         // validating data
@@ -67,7 +67,7 @@ exports.getPageDetails = async (req, res) => {
 
         // get different category of courses
         const diffCategories = await Category.find(
-            { _id: { $ne: category_id } },
+            { _id: { $ne: categoryId } },
 
         ).populate("courses").exec();
 
