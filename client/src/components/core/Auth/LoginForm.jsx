@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ScaleLoader from "react-spinners/ScaleLoader";
-import { login } from '../../../services/operations/authAPLs';
+import { login } from '../../../services/operations/authAPIs';
 
 const LoginForm = () => {
     const navigate = useNavigate();
@@ -25,6 +25,7 @@ const LoginForm = () => {
     function formSubmitHandler(e) {
         e.preventDefault();
         const { email, password } = formData;
+        console.log("first")
         dispatch(login(email, password, navigate))
     }
 
@@ -41,6 +42,7 @@ const LoginForm = () => {
                                 <label for='email' className='mb-1 text-md leading-[1.375rem] text-richblack-5'>Email Address<sup className="text-pink-200">*</sup></label>
                                 <input id='email' placeholder='Enter Email Address' type='email'
                                     name='email'
+                                    value={formData.email}
                                     onChange={onChangeHandler}
                                     style={{
                                         boxShadow: "inset 0 -1px 0px rgba(255, 255, 255, 0.18)",
@@ -50,7 +52,7 @@ const LoginForm = () => {
                             </div>
                             <div className='flex flex-col'>
                                 <label className='mb-1 text-md leading-[1.375rem] text-richblack-5'>Create Pasword<sup className="text-pink-200">*</sup></label>
-                                <div className='flex text-richblack-5 relative w-full '>
+                                <div className='flex text-richblack-5 relative w-full'>
                                     <input
                                         placeholder='Enter Pasword'
                                         style={{
@@ -73,6 +75,7 @@ const LoginForm = () => {
                                         )}
                                     </span>
                                 </div>
+                                <Link to={'/forgot-password'} className='text-right text-blue-100 text-sm mt-1 font-semibold tracking-wide'>Forgot Pasword</Link>
                             </div>
                             <button className='mt-6 rounded-[8px] bg-yellow-50 py-[8px] px-[12px] font-medium text-richblack-900 w-full'>Login</button>
                         </form>

@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { sendOTP } from '../../../services/operations/authAPLs'
+import { sendOTP } from '../../../services/operations/authAPIs'
 import { setSignupData } from '../../redux/slice/authSlice'
 
 const SignupForm = () => {
@@ -21,7 +21,7 @@ const SignupForm = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const  data  = useSelector((state) => state.auth.signupData)
+    // const  data  = useSelector((state) => state.auth.signupData)
 
     const { first_name, last_name, email, password, confirm_password } = formData;
 
@@ -46,7 +46,7 @@ const SignupForm = () => {
             account_type
         }
         dispatch(setSignupData(signupData))
-        console.log("printing 44444444444444444", data)
+        // console.log("printing 44444444444444444", data)
         dispatch(sendOTP(formData.email, navigate))
 
     }

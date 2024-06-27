@@ -6,7 +6,7 @@ import { BiArrowBack } from "react-icons/bi";
 import { Link, useNavigate } from "react-router-dom";
 import { RxCountdownTimer } from "react-icons/rx";
 import "../App.css";
-import { sendOTP, signUp } from '../services/operations/authAPLs';
+import { sendOTP, signUp } from '../services/operations/authAPIs';
 
 const VerifyEmail = () => {
     const { loading, signupData } = useSelector((state) => state.auth)
@@ -24,7 +24,7 @@ const VerifyEmail = () => {
     }
 
     return (
-        <div className='text-white mt-16 flex items-center justify-center min-h-screen '>
+        <div className='text-white flex items-center justify-center min-h-[calc(100vh-6rem)]'>
             {
                 loading ?
                     (

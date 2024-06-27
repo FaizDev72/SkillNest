@@ -13,7 +13,7 @@ router.post('/changePassword', auth, changePassword);
 
 
 // Password reset
-router.post('/reset-password-token', auth, resetPasswordToken);
-router.post('/reset-password-token', auth, resetPassword);
+router.post('/reset-password-token', resetPasswordToken);
+router.post('/reset-password', resetPassword);
 
 module.exports = router;

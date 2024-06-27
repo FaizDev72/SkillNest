@@ -38,3 +38,9 @@ html, body {
 .homepage_bg {
     background: url('../src/assets/Images/bghome.svg')
 }
+.button-disabled {
+    background-color: #ccc; /* Gray background */
+    color: #666; /* Darker text color */
+    cursor: not-allowed; /* Disabled cursor */
+  }
+  

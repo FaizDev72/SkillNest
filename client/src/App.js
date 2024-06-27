@@ -8,10 +8,12 @@ import Footer from "./components/common/Footer";
 import Category from "./pages/Category";
 import CourseDetails from "./pages/CourseDetails";
 import VerifyEmail from "./pages/VerifyEmail";
+import ForgotPassword from "./pages/ForgotPassword";
+import UpdatePassword from "./pages/UpdatePassword";
 
 function App() {
   return (
-    <div className="w-screen min-h-screen bg-richblack-900 flex flex-col font-inter">
+    <div className="w-screen min-h-screen bg-richblack-900 flex flex-col font-inter overflow-hidden">
       <Navbar />
       {/* <div className="w-11/12 mx-auto overflow-hidden"> */}
       <Routes>
@@ -21,12 +23,14 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/update-password/:token" element={<UpdatePassword />} />
 
         <Route path="/courses/:course_id" element={<CourseDetails />} />
       </Routes>
 
       {/* </div> */}
-      <Footer />
+      {/* <Footer /> */}
     </div>
 
   );

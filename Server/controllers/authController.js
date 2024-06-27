@@ -108,7 +108,7 @@ exports.signup = async (req, res) => {
         }
 
         // Get lastest form db 
-        const lastestOtp = await OTP.find({email}).sort({ created_at: -1 }).limit(1);
+        const lastestOtp = await OTP.find({ email }).sort({ created_at: -1 }).limit(1);
         console.log(lastestOtp)
 
         if (lastestOtp[0].otp != otp) {
@@ -166,7 +166,7 @@ exports.login = async (req, res) => {
         const { email, password } = req.body;
 
         // Validating Data
-        if (!email) {
+        if (!email || !password) {
             return res.status(400).json({
                 success: false,
                 message: 'Empty email field'
@@ -179,12 +179,13 @@ exports.login = async (req, res) => {
         if (!user) {
             return res.status(409).json({
                 success: false,
-                message: 'Email is already registered.'
+                message: 'User is not registered.'
             })
         }
 
         // compare password
         if (await bcrypt.compare(password, user.password)) {
+            console.log(user)
             // create jwt token
             const payload = {
                 email: user.email,
@@ -205,15 +206,19 @@ exports.login = async (req, res) => {
             }
 
             // return response
-            res.cookie("token", token, options).status(200).json({
+            console.log({ email, password })
+            return res.cookie("token", token, options).status(200).json({
                 success: true,
                 token,
                 user,
                 message: `User Login Success`,
             })
+        } else {
+            return res.status(401).json({
+                success: false,
+                message: `Password is incorrect`,
+            })
         }
-
-
 
     } catch (error) {
         console.log(error);
