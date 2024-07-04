@@ -19,9 +19,13 @@ const TabNavigationAndCards = () => {
     // console.log("currentCard", currentCard, "\ncurrentCourse", currentCourse, "\ncurrentTab", currentTab)
     return (
         <div className='mx-auto relative flex flex-col gap-3 items-center justify-center my-8 '>
-            <div>
-                <h1 className='text-white'>Unlock the<HighlightText text={"Power of Code"} /></h1>
-                <span className='text-richblack-800'>Learn to Build Anything You Can Imagine</span>
+            <div className='text-4xl font-semibold text-center mt-10 text-white'>
+                Unlock the 
+                <HighlightText text={"Power of Code"} />
+
+                <p className='text-center text-richblack-300 text-lg font-semibold mt-1'>
+                    Learn to Build Anything You Can Imagine
+                </p>
             </div>
             <div className='flex flex-col gap-10'>
                 <div className='text-richblack-300 bg-richblack-800 flex gap-8 w-fit p-2 rounded-full mx-auto my-8 mb-[220px]'>

@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken')
 const { sendMail } = require('../utils/sendMail')
 require('dotenv').config();
 const bcrypt = require('bcrypt')
+const { passwordUpdated } = require('../mail/templates/passwordUpdate')
 
 exports.sendOtp = async (req, res) => {
     try {
@@ -174,7 +175,7 @@ exports.login = async (req, res) => {
         }
 
         // Checking email id if exists in DB
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email }).populate("profile");
 
         if (!user) {
             return res.status(409).json({
@@ -193,7 +194,7 @@ exports.login = async (req, res) => {
                 account_type: user.account_type
             }
 
-            const token = jwt.sign(payload, process.env.ENCRYPTING_KEY, { expiresIn: '2h' });
+            const token = jwt.sign(payload, process.env.ENCRYPTING_KEY, { expiresIn: '24h' });
             // store token in db
             // await User.findByIdAndUpdate(user._id, { token }, { new: true });
             user.token = token;
@@ -231,16 +232,15 @@ exports.login = async (req, res) => {
 }
 
 exports.changePassword = async (req, res) => {
-
     try {
         // Getting the fields
-        const { old_password, new_password, confirm_password, id } = req.body;
-
+        const { current_password, new_password, confirm_password } = req.body;
+        const user_id = req.user.id;
         // Getting user details from DB
-        const user = await User.findById(id);
+        const user = await User.findById(user_id);
 
         // Validating the fields
-        if (!old_password || !new_password || !confirm_password) {
+        if (!current_password || !new_password || !confirm_password) {
             return res.status(400).json({
                 success: false,
                 message: 'Empty field'
@@ -248,46 +248,46 @@ exports.changePassword = async (req, res) => {
         }
 
         // Verifying old password
-        if (!(await bcrypt.compare(old_password, user.password))) {
-            return res.status(401).json({
-                success: false,
-                message: 'The Password is Incorrect',
-            })
+        if (await bcrypt.compare(current_password, user.password)) {
+            // Checking if old password and new password are same
+            if (current_password == new_password) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Enter Some different Password',
+                })
+            }
+
+            // Checking if new password and confirm passwords are same
+            if (new_password != confirm_password) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Password and confirm password doesnt match',
+                })
+            }
+
+            // Hashing the password
+            const hashedPassword = await bcrypt.hash(new_password, 10)
+
+            // updating the password in the DB
+            const updatedUser = await User.findByIdAndUpdate(user_id, { password: hashedPassword }, { new: true });
+
+            // sending mail
+            const info = await sendMail(user.email, `Password Updated Successfully for ${updatedUser.first_name} ${updatedUser.last_name}`, passwordUpdated(
+                updatedUser.email,
+                updatedUser.first_name,
+            ))
+
+            // return response
+            return res.status(200).json({
+                success: true,
+                message: 'Password Updated Successfully'
+            });
         }
+        return res.status(401).json({
+            success: false,
+            message: 'The Password is Incorrect',
+        })
 
-        // Checking if old password and new password are same
-        if (old_password == new_password) {
-            return res.status(401).json({
-                success: false,
-                message: 'Enter Some different Password',
-            })
-        }
-
-        // Checking if new password and confirm passwords are same
-        if (new_password != confirm_password) {
-            return res.status(401).json({
-                success: false,
-                message: 'Password and confirm password doesnt match',
-            })
-        }
-
-        // Hashing the password
-        const hashedPassword = bcrypt.compare(new_password, 10)
-
-        // updating the password in the DB
-        const updatedUser = await User.findByIdAndUpdate({ password: hashedPassword }, { new: true });
-
-        // sending mail
-        const info = await sendMail(user.email, `Password Updated Successfully for ${updatedUser.firstName} ${updatedUser.lastName}`, passwordUpdated(
-            updatedUser.email,
-            updatedUser.firstName,
-        ))
-
-        // return response
-        return res.status(200).json({
-            success: true,
-            message: 'Password Updated Successfully'
-        });
     } catch (error) {
         return res.status(500).json({
             success: false,

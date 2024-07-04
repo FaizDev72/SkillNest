@@ -7,16 +7,15 @@ const profileSchema = new mongoose.Schema({
     },
     image: {
         type: String,
-    }
-    ,
-    DOB: {
-        type: Date
     },
-    profession: {
-        type: String,
+    DOB: {
+        type: String
     },
     about: {
         type: String,
+    },
+    phone: {
+        type: Number,
     }
     // For Future Scope
     // address: [

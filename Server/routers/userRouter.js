@@ -9,7 +9,7 @@ const { resetPasswordToken, resetPassword } = require('../controllers/resetPassw
 router.post('/sendotp', sendOtp);
 router.post('/signup', signup);
 router.post('/login', login);
-router.post('/changePassword', auth, changePassword);
+router.post('/changepassword', auth, changePassword);
 
 
 // Password reset

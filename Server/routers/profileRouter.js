@@ -7,7 +7,7 @@ const { auth, isInstructor, isStudent, isAdmin } = require('../middlewares/authM
 
 router.get('/getUserDetails', auth, getUserByID)
 router.put('/updateProfile', auth, updateProfile);
-router.post('/deleteProfile', auth, deleteAccount);
+router.delete('/deleteProfile', auth, deleteAccount);
 router.put('/updateDisplayPicture', auth, updateUserImage);
 router.post('/', getUserCourses);
 

@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Course = require("../models/Course");
 const RatingAndReview = require("../models/RatingAndReview");
 
@@ -75,50 +76,60 @@ exports.createRating = async (req, res) => {
     }
 }
 
-// get average rating
 exports.getAverageRating = async (req, res) => {
     try {
-        // get data from request
         const { course_id } = req.body;
+        console.log(course_id, "course_id");
 
-        // calculate average
-        const result = await RatingAndReview.aggregate([
-            {
-                $match: {
-                    course_id: mongoose.Types.ObjectId(course_id)
+        // Step 1: Check with a simple find query
+        const findResult = await RatingAndReview.find({ course_id: new mongoose.Types.ObjectId(course_id) });
+        console.log(findResult, "find result");
+
+        // Step 2: If documents exist, perform the aggregation
+        if (findResult.length > 0) {
+            const result = await RatingAndReview.aggregate([
+                {
+                    $match: {
+                        course_id: new mongoose.Types.ObjectId(course_id)
+                    },
                 },
-            },
-            {
-                $group: {
-                    _id: null,
-                    averageRating: { $avg: "rating" },
+                {
+                    $group: {
+                        _id: null,
+                        averageRating: { $avg: "$rating" },
+                    }
                 }
-            }
-        ])
+            ]);
 
-        // return
-        if (result.length > 0) {
-            return res.status(200).json({
-                success: true,
-                averageRating: result[0].averageRating,
-            });
+            // Log the aggregation result
+            console.log(result, "aggregation result");
+
+            // Return the average rating
+            if (result.length > 0) {
+                return res.status(200).json({
+                    success: true,
+                    averageRating: result[0].averageRating,
+                });
+            }
         }
 
-        // if no rating/review exists
+        // If no rating/review exists or find result is empty
         return res.status(200).json({
             success: true,
             message: 'Average Rating is 0, no rating given till now',
             averageRating: 0,
-        })
+        });
 
     } catch (error) {
         console.log(error);
         return res.status(500).json({
             success: false,
             message: error.message
-        })
+        });
     }
-}
+};
+
+
 
 // get all rating and review
 exports.getAllRatingReview = async (req, res) => {

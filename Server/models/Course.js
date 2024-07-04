@@ -48,9 +48,12 @@ const courseSchema = new mongoose.Schema({
     }],
     rating_review: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "ReviewAndRating",
-        required: true
+        ref: "RatingAndReview",
     }],
+    instructions: {
+        type: [String],
+    },
+    createdAt: { type: Date, default: Date.now },
 });
 
 

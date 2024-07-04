@@ -5,25 +5,32 @@ const { destoryImageFromCloudinary, uploadImagetoCloudinary } = require("../util
 // update profile
 exports.updateProfile = async (req, res) => {
     try {
-        // getting data from request body
-        const { DOB = '', about = '', gender = '', profession = '', user_id } = req.body;
+        const {
+            first_name = "",
+            last_name = "",
+            about = "",
+            phone = "",
+            DOB = "",
+            gender = ""
+        } = req.body;
 
-        // get user
-        const userDetails = await User.findById(user_id);
+        const user_id = req.user.id;
 
-        // update
-        const updatedProfile = await Profile.findByIdAndUpdate(
-            { _id: userDetails.profile },
-            { DOB, about, gender, profession },
-            { new: true },
-        )
+        // update firstname lastname
+        let user = await User.findByIdAndUpdate(user_id, {first_name, last_name}, {new:true});
 
-        // return
+        // update profile info
+        let profile = await Profile.findByIdAndUpdate(user.profile,  { about, phone, DOB, gender }, { new: true })
+
+        // fetch latest user
+        const updatedUserDetails =  await User.findById(user_id).populate("profile").exec();
+
         return res.status(200).json({
             success: true,
-            message: 'Profile Updated Successfully',
-            profile,
-        });
+            message: "Profile updated successfully",
+            data:updatedUserDetails,
+          });
+
 
     } catch (error) {
         return res.status(500).json({
@@ -41,7 +48,7 @@ exports.deleteAccount = async (req, res) => {
         const user_id = req.user.id;
 
         // Check if user exists & validate
-        const userDetails = await User.find(user_id);
+        const userDetails = await User.findById(user_id);
 
         if (!userDetails) {
             return res.status(404).send({
@@ -98,10 +105,10 @@ exports.getUserByID = async (req, res) => {
 exports.updateUserImage = async (req, res) => {
     try {
         // Getting user details
-        const  user_id  = req.user.id;
-        const image = req.files.imageFile;
+        const user_id = req.user.id;
+        const image = req.files.displayPicture;
         console.log(user_id)
-        console.log(req.body)
+        console.log(image)
 
         // Fetching User data and Validating
         const user = await User.findById(user_id);
@@ -121,12 +128,13 @@ exports.updateUserImage = async (req, res) => {
 
         //Update image of user in profile schema
         const updatedProfile = await Profile.findByIdAndUpdate(user.profile, { image: newImageUrl.secure_url }, { new: true });
+        const userData = await User.findById(user_id).populate("profile");
 
         // return
         res.send({
             success: true,
             message: `Image Updated Successfully`,
-            data: updatedProfile,
+            data: userData,
         });
 
     } catch (error) {

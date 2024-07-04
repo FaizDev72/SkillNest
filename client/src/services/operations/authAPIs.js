@@ -66,7 +66,7 @@ export function login(email, password, navigate) {
             navigate('/dashboard/my-profile')
         } catch (error) {
             console.log("Login Failed...........", error.message)
-            toast.error("Failed to signup")
+            toast.error("Failed to login")
         }
         dispatch(setLoading(false))
     }
@@ -93,6 +93,7 @@ export function getTokenForPasswordReset(email, setEmailSent) {
         dispatch(setLoading(false))
     }
 }
+
 export function resetPassword(token, password, confirm_password, navigate) {
     return async (dispatch) => {
         dispatch(setLoading(true))
@@ -109,5 +110,16 @@ export function resetPassword(token, password, confirm_password, navigate) {
             toast.error("Failed to update password")
         }
         dispatch(setLoading(false))
+    }
+}
+
+export function logout(navigate) {
+    return async (dispatch) => {
+        dispatch(setToken(null));
+        dispatch(setUser(null))
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
+        toast.success("Logged Out")
+        navigate('/')
     }
 }

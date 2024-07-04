@@ -5,7 +5,8 @@ require('dotenv').config();
 exports.auth = (req, res, next) => {
     try {
         // get details from body or header or cookies
-        const token = req.body.token || req.cookies.token || req.header('Authorization').replace("Bearer ", "");
+        const token = req.body.token || req.cookies.token || req.header("Authorization").replace("Bearer ", "");
+        console.log("Token ->>> ",token)
 
         // validate
         if (!token) {

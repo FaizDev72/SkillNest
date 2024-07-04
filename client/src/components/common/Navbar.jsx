@@ -6,6 +6,8 @@ import { useSelector } from 'react-redux'
 import { IoIosArrowDown } from "react-icons/io";
 import { apiConnector } from '../../services/apiConnector'
 import { categoriesApi } from '../../services/apis'
+import ProfileDropDown from '../core/Auth/ProfileDropDown'
+import { AiOutlineShoppingCart } from "react-icons/ai";
 
 const Navbar = () => {
     const location = useLocation();
@@ -46,7 +48,7 @@ const Navbar = () => {
                                         <IoIosArrowDown />
                                     </div>
                                     <div className="invisible absolute left-[50%] top-[50%] z-[1000] flex w-[200px] translate-x-[-50%] translate-y-[3em] flex-col rounded-lg bg-richblack-5 p-4 text-richblack-900 opacity-0 transition-all duration-150 group-hover:visible group-hover:translate-y-[1.65em] group-hover:opacity-100 lg:w-[300px]">
-                                    <div className="absolute left-[50%] top-0 -z-10 h-6 w-6 translate-x-[80%] translate-y-[-40%] rotate-45 select-none rounded bg-richblack-5"></div>
+                                        <div className="absolute left-[50%] top-0 -z-10 h-6 w-6 translate-x-[80%] translate-y-[-40%] rotate-45 select-none rounded bg-richblack-5"></div>
                                         {
                                             subLinks.map((catg, index) => (
                                                 <Link to={`catalog/${catg.category_name.split(" ").join("-").toLowerCase()}`} key={index} className='transition-all duration-200 border-b-[1px] border-richblack-50 w-full text-center py-4 leading-1 hover:bg-richblack-50 rounded-lg hover:text-blue-200'>{catg.category_name}</Link>
@@ -79,11 +81,14 @@ const Navbar = () => {
                         )
                     }{
                         (user && user != null) && (
-                            <div>Profile</div>
+                            <ProfileDropDown />
                         )
                     }{
                         (user != null && user?.account_type !== 'Instructor') && (
-                            <div>{totalItems}</div>
+                            <Link to={"/dashboard/cart"} className="relative">
+                                <AiOutlineShoppingCart className="text-2xl text-richblack-100" />
+                                {totalItems > 0 && <span>{totalItems}</span>}
+                            </Link>
                         )
                     }
                 </div>

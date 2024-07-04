@@ -2,20 +2,21 @@ const Category = require("../models/Category");
 const Course = require("../models/Course");
 const User = require("../models/User");
 const { uploadImagetoCloudinary } = require("../utils/cloudinaryAssetsHandlers");
+const { convertSecondsToDuration } = require("../utils/secToDuration");
 
 
 // Create Courses
 exports.createCourse = async (req, res) => {
     try {
         // Fetching Data
-        const { course_name, description, price, course_learning, tag, category } = req.body;
+        const { course_name, description, price, course_learning, tag, category, instructions } = req.body;
         const instructor = req.user.id;
 
         const thumbnail = req.files.thumbnail
         console.log({ course_name, instructor, description, price, course_learning, tag, category, thumbnail })
 
         // Validate
-        if (!course_name || !instructor || !description || !price || !course_learning || !tag || !category) {
+        if (!course_name || !instructor || !description || !price || !course_learning || !tag || !category || !instructions) {
             res.status(400).json({
                 success: false,
                 message: 'All Filds are mandatory',
@@ -34,7 +35,8 @@ exports.createCourse = async (req, res) => {
             thumbnail: thumbnailUrl.secure_url,
             tag,
             instructor,
-            category
+            category,
+            instructions
         });
 
         // Fetch the newly created course and populate the category field
@@ -101,6 +103,7 @@ exports.getCourseById = async (req, res) => {
 
     try {
         const { course_id } = req.body
+        console.log(course_id)
 
         if (!course_id) {
             return res.status(400).json({
@@ -109,24 +112,46 @@ exports.getCourseById = async (req, res) => {
             });
         }
 
-        const course = await Course.findById(course_id).populate({
-            path: "instructor",
-            populate: {
-                path: "profile"
-            },
-        }).exec();
+        const course = await Course.findById(course_id)
+            .populate({
+                path: "instructor",
+                populate: {
+                    path: "profile"
+                }
+            })
+            .populate("rating_review")
+            .populate("course_content")
+            .populate({
+                path: "course_content",
+                populate: {
+                    path: "sub_section",
+                    select: "-video",
+                },
+            })
+            .exec();
 
         if (!course) {
             return res.status(400).json({
                 success: false,
-                message: `Could not find the course with ${courseId}`,
+                message: `Could not find the course with ${course_id}`,
             });
         }
+
+        let totalDurationInSeconds = 0;
+
+        course.course_content.map((sec) => {
+            sec.sub_section.map((subSec) => {
+                const timeDurationInSeconds = parseInt(subSec.duration)
+                totalDurationInSeconds += timeDurationInSeconds
+            })
+        })
+
+        let totalDuration = convertSecondsToDuration(totalDurationInSeconds);
 
         return res.status(200).json({
             success: true,
             message: "Course Details Fetched Successfully",
-            data: course,
+            data: { course, totalDuration },
         });
     } catch (error) {
         console.log(error);
