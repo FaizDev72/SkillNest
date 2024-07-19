@@ -1,6 +1,6 @@
 const express = require('express');
 const { dbConnect } = require('./config/db.conn');
-const { cloudinaryConnect } = require('./config/Cloudnary');
+const { cloudinaryConnect } = require('./config/cloudnary');
 const userRouter = require('./routers/userRouter')
 const profileRouter = require('./routers/profileRouter')
 const paymentRouter = require('./routers/paymentRouter')
