@@ -68,7 +68,7 @@ const ChangeProfilePicture = () => {
                         <div onClick={refTrigger} disabled={loading} className='cursor-pointer rounded-md bg-richblack-700 py-2 px-5 font-semibold text-richblack-50'>select</div>
                         <IconBtn
                             text={loading ? "Uploading" : "Upload"}
-                            onclick={uploadFileHandler}
+                            onClick={uploadFileHandler}
                         >
                             {
                                 !loading && (

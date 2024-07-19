@@ -1,5 +1,8 @@
 const Category = require("../models/Category");
 const Course = require("../models/Course");
+const Section = require("../models/Section");
+const SubSection = require("../models/SubSection");
+const CourseProgress = require("../models/CourseProgress");
 const User = require("../models/User");
 const { uploadImagetoCloudinary } = require("../utils/cloudinaryAssetsHandlers");
 const { convertSecondsToDuration } = require("../utils/secToDuration");
@@ -9,17 +12,23 @@ const { convertSecondsToDuration } = require("../utils/secToDuration");
 exports.createCourse = async (req, res) => {
     try {
         // Fetching Data
-        const { course_name, description, price, course_learning, tag, category, instructions } = req.body;
+        console.log(req)
+        let { course_name, description, price, course_learning, tag: _tag, category, instructions: _instructions, status } = req.body;
         const instructor = req.user.id;
 
         const thumbnail = req.files.thumbnail
-        console.log({ course_name, instructor, description, price, course_learning, tag, category, thumbnail })
+
+        // Convert the tag and instructions from stringified Array to Array
+        const tag = JSON.parse(_tag)
+        const instructions = JSON.parse(_instructions)
+
+        console.log({ course_name, instructor, description, price, course_learning, tag, category, thumbnail, instructions })
 
         // Validate
         if (!course_name || !instructor || !description || !price || !course_learning || !tag || !category || !instructions) {
-            res.status(400).json({
+            return res.status(400).json({
                 success: false,
-                message: 'All Filds are mandatory',
+                message: 'All Fields are mandatory',
             });
         }
 
@@ -99,6 +108,7 @@ exports.getAllCourses = async (req, res) => {
     }
 };
 
+// Get Course By Id
 exports.getCourseById = async (req, res) => {
 
     try {
@@ -119,6 +129,7 @@ exports.getCourseById = async (req, res) => {
                     path: "profile"
                 }
             })
+            .populate("category")
             .populate("rating_review")
             .populate("course_content")
             .populate({
@@ -162,4 +173,200 @@ exports.getCourseById = async (req, res) => {
     }
 
 
+}
+
+exports.getInstructorCourses = async (req, res) => {
+    try {
+        // Get the instructor ID from the authenticated user or request body
+        const instructor_id = req.user.id
+
+        // Find all courses belonging to the instructor
+        const instructorCourses = await Course.find({
+            instructor: instructor_id,
+        }).sort({ createdAt: -1 })
+
+        // Return the instructor's courses
+        res.status(200).json({
+            success: true,
+            data: instructorCourses,
+        })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve instructor courses",
+            error: error.message,
+        })
+    }
+}
+
+exports.updateCourse = async (req, res) => {
+    try {
+        const { course_id } = req.body;
+        // console.log("loging body=>> ", req.body);
+
+        let course = await Course.findById(course_id)
+        let updates = req.body;
+
+        if (!course) {
+            return res.status(404).json({
+                message: "Course not found"
+            })
+        }
+
+        if (req.files) {
+            console.log("Need to update Thumnail Image")
+            const image = req.files.thumbnail
+            const newImage = await uploadImagetoCloudinary(image, process.env.CLOUD_FOLDER)
+            course.thumbnail = newImage.secure_url;
+        }
+
+        for (const key in updates) {
+            if (updates.hasOwnProperty(key)) {
+                if (key === 'instructions' || key === 'tag') {
+                    course[key] = JSON.parse(updates[key])
+                } else {
+                    course[key] = updates[key];
+                }
+            }
+        }
+
+        await course.save();
+
+        const updatedCourse = await Course.findOne({ _id: course_id })
+            .populate({
+                path: "instructor",
+                populate: {
+                    path: "profile"
+                }
+            })
+            .populate("category")
+            .populate("rating_review")
+            .populate({
+                path: "course_content",
+                populate: {
+                    path: "sub_section"
+                }
+            }).exec();
+
+        res.json({
+            success: true,
+            message: "Course updated successfully",
+            data: updatedCourse,
+        })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message,
+        })
+    }
+
+}
+
+exports.getFullCourseDetails = async (req, res) => {
+    try {
+        const { course_id } = req.body;
+        const user_id = req.user.id;
+        console.log(course_id, user_id)
+        const courseDetails = await Course.findById(course_id)
+            .populate({
+                path: "instructor",
+                populate: {
+                    path: "profile"
+                }
+            })
+            .populate("category")
+            .populate("rating_review")
+            .populate("course_content")
+            .populate({
+                path: "course_content",
+                populate: {
+                    path: "sub_section",
+                },
+            })
+            .exec();
+
+        let courseProgressCount = await CourseProgress.findOne({ course_id, user_id })
+
+        if (!courseDetails) {
+            return res.status(400).json({
+                success: false,
+                message: `Could not find course with id: ${course_id}`,
+            })
+        }
+
+        let totalDurationInSeconds = 0;
+
+        courseDetails.course_content.forEach((section) => {
+            section.sub_section.forEach((subSection) => {
+                const timeDurationInSeconds = parseInt(subSection.duration)
+                totalDurationInSeconds += timeDurationInSeconds
+            })
+        })
+
+        const totalDuration = convertSecondsToDuration(totalDurationInSeconds)
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                courseDetails,
+                totalDuration,
+                completedVideos: courseProgressCount?.completed_videos
+                    ? courseProgressCount?.completed_videos
+                    : [],
+            },
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        })
+    }
+}
+
+exports.deleteCourse = async (req, res) => {
+    try {
+        const { course_id } = req.body;
+        console.log(course_id)
+
+        const course = await Course.findById(course_id);
+        if (!course) {
+            return res.status(404).json({ message: "Course not found" })
+        }
+
+        // Unenroll students from course
+        const studentsEnrolled = course.student_enrolled
+        for (const user_id of studentsEnrolled) {
+            await User.findByIdAndUpdate(user_id, { $pull: { courses: course_id } })
+        }
+
+        // Delete Sections and Sub Sections
+        for (const section_id of course.course_content) {
+            const section = await Section.findById(section_id)
+            if (section) {
+                for (const sub_section_id of section.sub_section) {
+                    await SubSection.findByIdAndDelete(sub_section_id)
+                }
+            }
+            // Delete Section
+            await Section.findByIdAndDelete(section_id)
+        }
+
+        await Course.findByIdAndDelete(course_id);
+        return res.status(200).json({
+            success: true,
+            message: "Course deleted successfully",
+        })
+
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: error.message,
+        })
+    }
 }

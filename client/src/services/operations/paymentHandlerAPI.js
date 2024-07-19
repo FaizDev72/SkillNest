@@ -2,6 +2,7 @@ import rzpLogo from "../../assets/Logo/rzp_logo.png";
 import { toast } from "react-hot-toast";
 import { apiConnector } from "../apiConnector";
 import { paymentsEndpoints } from "../apis";
+import { resetCart } from "../../components/redux/slice/cartSlice";
 
 function loadScript(src) {
     return new Promise((resolve) => {
@@ -23,7 +24,7 @@ function loadScript(src) {
 
 export const buyCourse = async (courses, token, user, dispatch, navigate) => {
     const toast_id = toast.loading("Loading")
-    // console.log(courses, token, user)
+    console.log(courses, token, user)
     try {
         const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js")
         if (!res) {
@@ -87,6 +88,7 @@ async function verifySignture(bodyData, token, navigate, dispatch) {
         }
         toast.success("Payment Successful. You are Added to the course ")
         navigate("/dashboard/enrolled-courses")
+        dispatch(resetCart())
     } catch (error) {
         console.log("PAYMENT VERIFY ERROR............", error)
         toast.error("Could Not Verify Payment.")

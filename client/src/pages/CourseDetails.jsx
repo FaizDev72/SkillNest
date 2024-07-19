@@ -15,6 +15,7 @@ import CourseFloatingCard from '../components/core/Course/CourseFloatingCard';
 import ReactMarkdown from 'react-markdown'
 import CourseAccordionBar from '../components/core/Course/CourseAccordionBar';
 import { buyCourse } from '../services/operations/paymentHandlerAPI';
+import ConfirmationModal from "../components/common/ConfirmationModal"
 
 const CourseDetails = () => {
     const { course_id } = useParams();
@@ -24,6 +25,7 @@ const CourseDetails = () => {
     const navigate = useNavigate();
     const { loading } = useSelector((state) => state.profile)
     const [response, setResponse] = useState(null);
+    const [confirmationModal, setConfirmationModal] = useState(null)
 
     useEffect(() => {
         const fetchDataHandler = async () => {
@@ -75,7 +77,16 @@ const CourseDetails = () => {
     function paymentHandler() {
         if (token) {
             buyCourse([course_id], token, user, dispatch, navigate)
+            return;
         }
+        setConfirmationModal({
+            text1: "You are not logged in!",
+            text2: "Please login to Purchase Course.",
+            btn1: "Login",
+            btn2: "Cancel",
+            btnHandler1: () => navigate("/login"),
+            btnHandler2: () => setConfirmationModal(null),
+        })
     }
 
     if (loading || !response) {
@@ -122,7 +133,7 @@ const CourseDetails = () => {
 
                     {/* Floating Card */}
                     <div className="right-[1rem] top-[60px] mx-auto hidden min-h-[600px] w-1/3 max-w-[410px] translate-y-24 md:translate-y-0 lg:absolute  lg:block">
-                        <CourseFloatingCard response={response.data} token={token} paymentHandler={paymentHandler} />
+                        <CourseFloatingCard response={response.data} setConfirmationModal={setConfirmationModal} paymentHandler={paymentHandler} />
                     </div>
 
                 </div>
@@ -178,6 +189,7 @@ const CourseDetails = () => {
                 </div>
             </div>
             <Footer />
+            {confirmationModal && <ConfirmationModal modalContent={confirmationModal} />}
         </>
     )
 }

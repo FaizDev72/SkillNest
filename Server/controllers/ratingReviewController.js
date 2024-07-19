@@ -5,22 +5,23 @@ const RatingAndReview = require("../models/RatingAndReview");
 // create Rating
 exports.createRating = async (req, res) => {
     try {
-        // fetch data
-        const { rating, review, user_id, course_id } = req.body;
+        // Fetch data
+        const { rating, review, course_id } = req.body;
+        const user_id = req.user.id;
 
-        // validating data
+        // Validate data
         if (!rating || !review || !user_id || !course_id) {
-            return res.status(500).json({
+            return res.status(400).json({
                 success: false,
-                message: 'Missing Values',
+                message: 'Missing required fields',
             });
         }
 
-        // check if user is enrolled or not
-        const courseDetails = await Course.find({
+        // Check if user is enrolled in the course
+        const courseDetails = await Course.findOne({
             _id: course_id,
-            student_enrolled: { $eleMatch: { $eq: user_id } }
-        })
+            student_enrolled: { $elemMatch: { $eq: user_id } }
+        });
 
         if (!courseDetails) {
             return res.status(404).json({
@@ -29,52 +30,56 @@ exports.createRating = async (req, res) => {
             });
         }
 
-        // checking if user has already done comment on same course
-        const alreadyRatedTheCourse = await RatingAndReview.find({
+        // Check if user has already reviewed the course
+        const alreadyReviewed = await RatingAndReview.findOne({
             user_id,
             course_id,
-        })
+        });
 
-        if (alreadyRatedTheCourse) {
+        if (alreadyReviewed) {
             return res.status(403).json({
                 success: false,
                 message: 'Course is already reviewed by the user',
             });
         }
 
-        // create rating
+        // Create rating and review
         const ratingReview = await RatingAndReview.create({
             rating,
             review,
             user_id,
             course_id,
-        })
+        });
 
-        // add review id to course->review$rating
+        // Add review id to course's rating_review array
         await Course.findByIdAndUpdate(
             course_id,
             {
-                $push:
-                    { rating_review: ratingReview._id }
+                $push: { rating_review: ratingReview._id }
             },
             { new: true }
         );
 
-        // return
-        return res.status(200).json({
+        // Save course details
+        await courseDetails.save();
+
+        // Return response
+        return res.status(201).json({
             success: true,
-            message: 'Rating and Reviews created successfully',
+            message: 'Rating and review created successfully',
             ratingReview,
-        })
+        });
 
     } catch (error) {
         console.log(error);
         return res.status(500).json({
             success: false,
-            message: error.message
-        })
+            message: 'Internal server error',
+            error: error.message
+        });
     }
-}
+};
+
 
 exports.getAverageRating = async (req, res) => {
     try {
@@ -128,8 +133,6 @@ exports.getAverageRating = async (req, res) => {
         });
     }
 };
-
-
 
 // get all rating and review
 exports.getAllRatingReview = async (req, res) => {

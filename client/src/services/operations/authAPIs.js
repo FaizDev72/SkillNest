@@ -3,6 +3,7 @@ import { apiConnector } from "../apiConnector"
 import { authApi } from "../apis"
 import { setLoading, setToken } from '../../components/redux/slice/authSlice'
 import { setUser } from "../../components/redux/slice/profileSlice"
+import { resetCart } from "../../components/redux/slice/cartSlice"
 
 export function sendOTP(email, navigate) {
     return async (dispatch) => {
@@ -117,6 +118,7 @@ export function logout(navigate) {
     return async (dispatch) => {
         dispatch(setToken(null));
         dispatch(setUser(null))
+        dispatch(resetCart())
         localStorage.removeItem("token")
         localStorage.removeItem("user")
         toast.success("Logged Out")
