@@ -5,6 +5,7 @@ import IconBtn from '../../common/IconBtn'
 import { useNavigate } from 'react-router-dom'
 import { VscAdd } from "react-icons/vsc"
 import CoursesTable from "./InstructorCourses/CourseTable"
+import isProduction from '../../../utils/logger';
 
 const MyCourses = () => {
 
@@ -16,10 +17,11 @@ const MyCourses = () => {
     (async () => {
       try {
         const response = await fetchInstructorCourses(token);
-        console.log("response", response)
         setCourses(response)
       } catch (error) {
+        if (!isProduction()) {
         console.log("Error occured while fetching Instructor Courses")
+        }
       }
     })()
   }, [])

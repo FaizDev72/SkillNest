@@ -6,6 +6,7 @@ import IconBtn from '../../../common/IconBtn';
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"
 import toast from 'react-hot-toast';
 import { changePassword } from '../../../../services/operations/settingAPIs';
+import isProduction from '../../../../utils/logger';
 
 const UpdatePassword = () => {
 
@@ -19,7 +20,6 @@ const UpdatePassword = () => {
   const dispatch = useDispatch();
 
   function submitChangePasswordHandler(data) {
-    console.log(data)
     if (data.new_password !== data.confirm_password) {
       toast.error("Confirm Password Doesn't Match")
       return
@@ -31,7 +31,9 @@ const UpdatePassword = () => {
     try {
       changePassword(data, token)
     } catch (error) {
+      if (!isProduction()) {
       console.log('ERROR MESSAGE - ', error.message)
+      }
     }
 
   }

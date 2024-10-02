@@ -14,7 +14,6 @@ import { setCourse } from '../../../../redux/slice/courseSlice'
 const NestedSectionView = ({ editSectionNameHandler }) => {
     const { token } = useSelector((state) => state.auth)
     const { course } = useSelector((state) => state.course)
-    console.log("course ->>", course)
     const [addSubSection, setAddSubSection] = useState(null)
     const [viewSubSection, setViewSubSection] = useState(null)
     const [editSubSection, setEditSubSection] = useState(null)

@@ -17,7 +17,6 @@ const EditCourse = () => {
     useEffect(() => {
         (async () => {
             setLoading(true)
-            console.log(course_id)
             let result = await getFullCourseDetails(course_id, token);
 
             if (result) {

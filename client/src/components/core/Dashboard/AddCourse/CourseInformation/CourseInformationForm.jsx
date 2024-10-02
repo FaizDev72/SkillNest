@@ -25,7 +25,6 @@ const CourseInformationForm = () => {
       setLoading(true)
       const allCategories = await fetchCourseCategories();
       setCategories(allCategories.data.data)
-      console.log(allCategories.data.data)
       setLoading(false)
     }
 
@@ -63,7 +62,6 @@ const CourseInformationForm = () => {
   }
 
   async function onSubmitHandler(data) {
-    console.log(data)
     // first check for editCourse
     if (editCourse) {
       const currentValues = getValues();
@@ -127,7 +125,6 @@ const CourseInformationForm = () => {
         dispatch(setStep(2))
         dispatch(setCourse(response?.data?.data))
       }
-      // console.log("Printing Response",response.data.data)
       setLoading(false)
     }
   }

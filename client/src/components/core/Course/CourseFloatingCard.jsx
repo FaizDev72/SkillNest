@@ -21,7 +21,6 @@ const CourseFloatingCard = ({ response, paymentHandler, setConfirmationModal }) 
         toast.success("Link copied to clipboard")
     }
 
-    console.log("Printing Response.course ", response)
     function handleAddToCart() {
         if (user && user?.account_type === ACCOUNT_TYPE.INSTRUCTOR) {
             toast.error("You are an Instructor. You can't buy a course.")
@@ -42,7 +41,6 @@ const CourseFloatingCard = ({ response, paymentHandler, setConfirmationModal }) 
         }
     }
 
-    console.log("Printing Course->>>>>>>> ", response)
     const { thumbnail, price } = response.course
 
     return (

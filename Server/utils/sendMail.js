@@ -18,10 +18,10 @@ exports.sendMail = async (sendTo, subject, body) => {
             html: `${body}`
         })
 
-        console.log("Email Information ", info)
         return info;
 
     } catch (error) {
-        console.log("Error occured during sending mail ", error)
-    }
+        if (!inProduction()) {
+            console.log("Error occurred during sending mail: ", error); 
+        }    }
 }

@@ -6,7 +6,8 @@ const { instance } = require('../config/razorPay');
 const { sendMail } = require('../utils/sendMail');
 const { mongoose } = require('mongoose');
 const { courseEnrollment } = require("../mail/templates/courseEnrollmentEmail")
-const { paymentSuccessEmailTmp } = require("../mail/templates/paymentSuccessEmail")
+const { paymentSuccessEmailTmp } = require("../mail/templates/paymentSuccessEmail");
+const inProduction = require('../utils/logger');
 require('dotenv').config();
 
 // Capture Payments
@@ -29,7 +30,6 @@ exports.capturePayment = async (req, res) => {
         let course;
         try {
             course = await Course.findById(course_id)
-            console.log(course)
             if (!course) {
                 return res.json({
                     success: false,
@@ -46,7 +46,9 @@ exports.capturePayment = async (req, res) => {
 
             totalAmount += course.price;
         } catch (error) {
+            if (!inProduction()) {
             console.log(error)
+            }
             return res.status(500).json({
                 success: false, message: error.message
             })
@@ -59,17 +61,17 @@ exports.capturePayment = async (req, res) => {
         receipt: Math.random(Date.now()).toString(),
     }
 
-    console.log(options.receipt)
 
     try {
         const paymentResponse = await instance.orders.create(options)
-        console.log(paymentResponse)
         res.json({
             success: true,
             data: paymentResponse,
         })
     } catch (error) {
+        if (!inProduction()) {
         console.log(error)
+        }
         res.status(500).json({
             success: false, message: "Could not initiate order."
         })
@@ -128,7 +130,6 @@ enrollStudents = async (courses, user_id, res) => {
                     success: false, error: "Course not found"
                 })
             }
-            console.log("Updated course: ", course)
 
             const courseProgress = await CourseProgress.create({
                 course_id,
@@ -138,15 +139,15 @@ enrollStudents = async (courses, user_id, res) => {
 
             const enrolledStudent = await User.findByIdAndUpdate(user_id, { $push: { course_progress: courseProgress?._id, courses: course_id } }, { new: true });
 
-            console.log("Enrolled student: ", enrolledStudent)
 
             // Send an email notification to the enrolled student
             const emailResponse = sendMail(enrolledStudent.email, `Successfully Enrolled onto the ${course.course_name}`, courseEnrollment(course.course_name, `${enrolledStudent.first_name} ${enrolledStudent.last_name}`))
 
-            console.log("Email sent successfully: ", emailResponse.response)
 
         } catch (error) {
+            if (!inProduction()) {
             console.log(error)
+            }
             return res.status(400).json({ success: false, error: error.message })
         }
     }
@@ -159,17 +160,17 @@ exports.paymentSuccessEmail = async (req, res) => {
 
     try {
         const student = await User.findById(user_id);
-        console.log("Printing student->>>", student)
         if (!student) {
             return
         }
 
         // send payment success eamil
         const emailResponse = await sendMail(student.email, `Payment Recieved`, paymentSuccessEmailTmp(`${student.first_name} ${student.last_name}`, amount / 100, order_id, payment_id))
-        console.log("Email sent successfully: ", emailResponse.response)
 
     } catch (error) {
+        if (!inProduction()) {
         console.log("error in sending mail", error)
+        }
         return res
             .status(400)
             .json({ success: false, message: "Could not send email" })

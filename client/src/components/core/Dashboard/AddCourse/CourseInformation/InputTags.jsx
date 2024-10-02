@@ -20,14 +20,12 @@ const InputTags = ({ name, label, errors, register, placeholder, setValue, getVa
     }
 
     function deleteTagHandler(index) {
-        console.log(index)
         let newTags = tags.filter((tag) => tag !== tags[index])
         setTags(newTags)
     }
 
     useEffect(() => {
         // if (editCourse) {
-        //     console.log("Printing tags->> ",course.tag)
         //     setTags(course?.tag)
         // }
 
@@ -48,7 +46,6 @@ const InputTags = ({ name, label, errors, register, placeholder, setValue, getVa
 
     useEffect(() => {
         setValue(name, tags)
-        console.log(tags)
     }, [tags])
 
     return (

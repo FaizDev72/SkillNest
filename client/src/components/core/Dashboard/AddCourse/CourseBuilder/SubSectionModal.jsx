@@ -24,7 +24,6 @@ const SubSectionModal = ({ modalData, add = false, view = false, edit = false, s
     }, [])
 
     function isFormUpdated() {
-        console.log("in isFormUpdated")
         let currentValues = getValues();
 
         if (currentValues.lectureTitle !== modalData.sub_section_name ||
@@ -36,7 +35,6 @@ const SubSectionModal = ({ modalData, add = false, view = false, edit = false, s
     }
 
     async function editSubSectionHandler() {
-        console.log("in editSubSectionHandler")
         const currentValues = getValues();
 
         const formData = new FormData();
@@ -54,8 +52,6 @@ const SubSectionModal = ({ modalData, add = false, view = false, edit = false, s
 
         setLoading(true)
         const result = await updateSubSection(formData, token)
-        // console.log(result)
-        // console.log("Modal Data ->>", modalData)
         if (result) {
             let updatedCourseContent = course.course_content.map((section) =>
                 section._id === modalData.section_id ? result : section
@@ -82,7 +78,6 @@ const SubSectionModal = ({ modalData, add = false, view = false, edit = false, s
             return
         }
 
-        console.log("in onsubmit for create")
         const formData = new FormData()
         formData.append("section_id", modalData)
         formData.append("sub_section_name", data.lectureTitle)
@@ -91,16 +86,13 @@ const SubSectionModal = ({ modalData, add = false, view = false, edit = false, s
 
         setLoading(true)
         const result = await createSubSection(formData, token)
-        console.log("result->> ", result)
         if (result) {
-            console.log("Before course updated ->>> ", course)
-            console.log("id->>.", modalData)
+
             let updatedCourseContent = course.course_content.map((section) => (
                 section._id === modalData ? result : section
             ))
             const updatedCourse = { ...course, course_content: updatedCourseContent }
             dispatch(setCourse(updatedCourse))
-            console.log("After course updated ->>> ", updatedCourse)
         }
 
         setModalData(null)

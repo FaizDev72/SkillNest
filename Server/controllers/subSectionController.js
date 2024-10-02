@@ -11,8 +11,6 @@ exports.createSubSection = async (req, res) => {
         const video = req.files.videoFile;
 
 
-        // console.log(req)
-        // console.log(sub_section_name, section_id, sub_section_desc, video)
         // Validating Data
         if (!sub_section_name || !section_id || !sub_section_desc || !video) {
             return res.status(400).json({
@@ -65,7 +63,6 @@ exports.updateSubSection = async (req, res) => {
     try {
         // Getting data from requesting
         const { sub_section_name, sub_section_id, sub_section_desc, section_id } = req.body;
-        // console.log(sub_section_name, sub_section_id, sub_section_desc, section_id)
 
         // Retreiving Sub-Section
         const subSection = await SubSection.findById(sub_section_id)
@@ -91,12 +88,10 @@ exports.updateSubSection = async (req, res) => {
             const video = req.files.videoFile;
 
             // if video has been changed than first delete the preview video from cloudinary &
-            console.log("Preview Url ->>", subSection.video)
             await destoryImageFromCloudinary(subSection.video);
 
             // upload the new video 
             const newVideo = await uploadImagetoCloudinary(video, process.env.CLOUD_FOLDER, 1000)
-            console.log("New Url ->>", newVideo.secure_url)
             subSection.video = newVideo.secure_url;
             subSection.duration = `${newVideo.duration}`
         }
@@ -109,7 +104,6 @@ exports.updateSubSection = async (req, res) => {
             "sub_section"
         )
 
-        console.log("updated section", updatedSection)
 
         // return the updated section
         return res.json({
