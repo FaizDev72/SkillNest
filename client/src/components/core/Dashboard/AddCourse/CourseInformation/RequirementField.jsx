@@ -15,6 +15,7 @@ const RequirementField = ({ name, label, errors, register, getValues, setValue }
     }
 
     function removeInstructionHandler(index) {
+        console.log(index)
         setInstructionList(instructionList.filter((ele) => ele !== instructionList[index]))
     }
 

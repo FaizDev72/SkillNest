@@ -6,13 +6,13 @@ const CourseProgress = require("../models/CourseProgress");
 const User = require("../models/User");
 const { uploadImagetoCloudinary } = require("../utils/cloudinaryAssetsHandlers");
 const { convertSecondsToDuration } = require("../utils/secToDuration");
-const inProduction = require("../utils/logger");
 
 
 // Create Courses
 exports.createCourse = async (req, res) => {
     try {
         // Fetching Data
+        console.log(req)
         let { course_name, description, price, course_learning, tag: _tag, category, instructions: _instructions, status } = req.body;
         const instructor = req.user.id;
 
@@ -22,6 +22,7 @@ exports.createCourse = async (req, res) => {
         const tag = JSON.parse(_tag)
         const instructions = JSON.parse(_instructions)
 
+        console.log({ course_name, instructor, description, price, course_learning, tag, category, thumbnail, instructions })
 
         // Validate
         if (!course_name || !instructor || !description || !price || !course_learning || !tag || !category || !instructions) {
@@ -71,9 +72,7 @@ exports.createCourse = async (req, res) => {
             message: "Course Created Successfully",
         });
     } catch (error) {
-        if (!inProduction()) {
         console.log(error);
-        }
         return res.status(500).json({
             success: false,
             message: 'Failed to Create Course',
@@ -100,9 +99,7 @@ exports.getAllCourses = async (req, res) => {
         })
 
     } catch (error) {
-        if (!inProduction()) {
         console.log(error);
-        }
         return res.status(404).json({
             success: false,
             message: `Cannot Fetch Course Data`,
@@ -116,6 +113,7 @@ exports.getCourseById = async (req, res) => {
 
     try {
         const { course_id } = req.body
+        console.log(course_id)
 
         if (!course_id) {
             return res.status(400).json({
@@ -167,9 +165,7 @@ exports.getCourseById = async (req, res) => {
             data: { course, totalDuration },
         });
     } catch (error) {
-        if (!inProduction()) {
         console.log(error);
-        }
         return res.status(500).json({
             success: false,
             message: error.message,
@@ -207,6 +203,7 @@ exports.getInstructorCourses = async (req, res) => {
 exports.updateCourse = async (req, res) => {
     try {
         const { course_id } = req.body;
+        // console.log("loging body=>> ", req.body);
 
         let course = await Course.findById(course_id)
         let updates = req.body;
@@ -218,6 +215,7 @@ exports.updateCourse = async (req, res) => {
         }
 
         if (req.files) {
+            console.log("Need to update Thumnail Image")
             const image = req.files.thumbnail
             const newImage = await uploadImagetoCloudinary(image, process.env.CLOUD_FOLDER)
             course.thumbnail = newImage.secure_url;
@@ -271,6 +269,7 @@ exports.getFullCourseDetails = async (req, res) => {
     try {
         const { course_id } = req.body;
         const user_id = req.user.id;
+        console.log(course_id, user_id)
         const courseDetails = await Course.findById(course_id)
             .populate({
                 path: "instructor",
@@ -331,6 +330,7 @@ exports.getFullCourseDetails = async (req, res) => {
 exports.deleteCourse = async (req, res) => {
     try {
         const { course_id } = req.body;
+        console.log(course_id)
 
         const course = await Course.findById(course_id);
         if (!course) {

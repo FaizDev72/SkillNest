@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import IconBtn from '../../../common/IconBtn'
 import { updateProfile } from '../../../../services/operations/settingAPIs'
-import isProduction from '../../../../utils/logger'
 const genders = ["Male", "Female", "Non-Binary", "Prefer not to say", "other"]
 
 const EditProfile = () => {
@@ -16,12 +15,11 @@ const EditProfile = () => {
   const dispatch = useDispatch();
 
   function submitProfileInfo(data) {
+    console.log("FormData ->>>>>>>> ", data)
     try {
       dispatch(updateProfile(token, data));
     } catch (error) {
-      if (!isProduction()) {
       console.log('ERROR MESSAGE - ', error.message)
-      }
     }
   }
 

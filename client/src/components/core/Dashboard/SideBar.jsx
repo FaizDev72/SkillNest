@@ -11,6 +11,7 @@ const SideBar = () => {
   const { user } = useSelector((state) => state.profile)
   const dispatch = useDispatch()
   const navigate = useNavigate();
+  // console.log("account_type ->>>>> ", user.account_type)
   const [confirmationModal, setConfirmationModal] = useState(null);
 
   return (

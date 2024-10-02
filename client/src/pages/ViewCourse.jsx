@@ -16,6 +16,7 @@ const ViewCourse = () => {
     useEffect(() => {
         (async () => {
             const courseData = await getFullCourseDetails(course_id, token);
+            console.log("courseData->> ", courseData)
             dispatch(setCourseSectionData(courseData?.courseDetails.course_content));
             dispatch(setCurrentCourseData(courseData?.courseDetails))
             dispatch(setCompletedLectures(courseData?.completedVideos))

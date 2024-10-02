@@ -28,6 +28,7 @@ import VideoDetails from "./components/core/ViewCourse/VideoDetails";
 
 function App() {
   const { user } = useSelector((state) => state.profile)
+  console.log(user, "Print")
   return (
     <div className="w-screen min-h-screen bg-richblack-900 flex flex-col font-inter overflow-hidden">
       <Navbar />

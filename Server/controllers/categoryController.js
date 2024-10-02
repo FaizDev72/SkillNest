@@ -1,12 +1,12 @@
 const Category = require('../models/Category');
 const Course = require("../models/Course");
-const inProduction = require('../utils/logger');
 
 // create Category
 exports.createCategory = async (req, res) => {
     try {
         // get data
         const { category_name, category_desc } = req.body;
+        console.log({ category_name, category_desc })
 
         // validate
         if (!category_name || !category_desc) {
@@ -51,6 +51,7 @@ exports.getPageDetails = async (req, res) => {
     try {
         // get data from request body
         const { categoryId } = req.body;
+        console.log(categoryId)
 
         // get courses of category
         const selectedCategory = await Category.findById(categoryId)
@@ -95,9 +96,7 @@ exports.getPageDetails = async (req, res) => {
         })
 
     } catch (error) {
-        if (!inProduction()) {
         console.log(error);
-        }
         return res.status(500).json({
             success: false,
             message: error.message,

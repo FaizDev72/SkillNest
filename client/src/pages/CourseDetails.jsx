@@ -16,7 +16,6 @@ import ReactMarkdown from 'react-markdown'
 import CourseAccordionBar from '../components/core/Course/CourseAccordionBar';
 import { buyCourse } from '../services/operations/paymentHandlerAPI';
 import ConfirmationModal from "../components/common/ConfirmationModal"
-import isProduction from '../utils/logger';
 
 const CourseDetails = () => {
     const { course_id } = useParams();
@@ -33,10 +32,9 @@ const CourseDetails = () => {
             try {
                 const courseDetail = await fetchCourseDetails(course_id)
                 setResponse(courseDetail);
+                console.log("Print object ->>>>>> ", courseDetail.data.rating_review)
             } catch (error) {
-                if (!isProduction()) {
                 console.log("Could not fetch Course Details")
-                }
             }
         }
 
@@ -69,6 +67,7 @@ const CourseDetails = () => {
 
     const [isActive, setIsActive] = useState(Array(0));
     function handleActive(id) {
+        console.log(id)
         setIsActive(
             !isActive.includes(id) ?
                 isActive.concat([id]) :

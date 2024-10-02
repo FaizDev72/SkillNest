@@ -25,6 +25,7 @@ const LoginForm = () => {
     function formSubmitHandler(e) {
         e.preventDefault();
         const { email, password } = formData;
+        console.log("first")
         dispatch(login(email, password, navigate))
     }
 

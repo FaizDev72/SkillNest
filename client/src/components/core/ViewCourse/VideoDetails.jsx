@@ -28,6 +28,8 @@ const VideoDetails = () => {
             } else {
                 const filteredSection = courseSectionData.filter((section) => section?._id === section_id)
                 const filteredSubSection = filteredSection?.[0]?.sub_section.filter((subSec) => subSec?._id === sub_section_id)
+                // console.log("filteredSubSection->> ", filteredSubSection[0])
+                // console.log(filteredSection)
                 setLectureData(filteredSubSection[0])
                 setPreviewSource(currentCourseData?.thumbnail);
                 setVideoEnded(false)
@@ -60,6 +62,7 @@ const VideoDetails = () => {
         const currentSectionIndex = courseSectionData.findIndex((section) => section._id === section_id)
         const currentSubSectionIndex = courseSectionData[currentSectionIndex]?.sub_section.findIndex((subSec) => subSec._id === sub_section_id)
         const noOfSubSection = courseSectionData[currentSectionIndex]?.sub_section.length;
+        console.log(currentSectionIndex, currentSubSectionIndex, noOfSubSection)
         if (currentSubSectionIndex !== noOfSubSection - 1) {
             const nextSubSectinId = courseSectionData[currentSectionIndex]?.sub_section[currentSubSectionIndex + 1]._id;
             navigate(`/view-course/${course_id}/section/${section_id}/sub-section/${nextSubSectinId}`);

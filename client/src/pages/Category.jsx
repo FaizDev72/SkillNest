@@ -5,7 +5,6 @@ import { categoriesApi } from '../services/apis';
 import CourseSlider from '../components/core/Category/CourseSlider';
 import CourseCard from '../components/core/Category/CourseCard';
 import Footer from '../components/common/Footer'
-import isProduction from '../utils/logger';
 
 const Category = () => {
 
@@ -19,13 +18,15 @@ const Category = () => {
         const getCategories = async () => {
             try {
                 let response = await apiConnector("GET", categoriesApi.GETALLCATEGORIES_API)
+                // console.log(response)
+                // console.log(catalog_name)
 
                 const id = response?.data?.data?.filter((ele) => catalog_name === ele.category_name.split(" ").join("-").toLowerCase())[0]._id;
+                console.log(id)
                 setCategoryId(id)
             } catch (error) {
-                if (!isProduction()) {
-                console.log("Error fetching data", error);
-                }
+                console.log("Error fetching data");
+                console.log(error)
             }
         }
         getCategories();
@@ -33,12 +34,14 @@ const Category = () => {
 
     const getCategoryById = async () => {
         try {
+            console.log("categoryId " + categoryId)
             const response = await apiConnector("POST", categoriesApi.GETCATEGORYBYID, { categoryId: categoryId, })
+            console.log(response?.data)
             setCategoryData(response?.data)
+            console.log(categoryData);
         } catch (error) {
-            if (!isProduction()) {
-            console.log("Error fetching data ", error);
-            }
+            console.log("Error fetching data ");
+            console.log(error)
         }
     }
     useEffect(() => {

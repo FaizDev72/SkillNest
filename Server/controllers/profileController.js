@@ -3,8 +3,7 @@ const Profile = require("../models/Profile");
 const Course = require("../models/Course");
 const User = require("../models/User");
 const { destoryImageFromCloudinary, uploadImagetoCloudinary } = require("../utils/cloudinaryAssetsHandlers");
-const { convertSecondsToDuration } = require("../utils/secToDuration");
-const inProduction = require("../utils/logger");
+const { convertSecondsToDuration } = require("../utils/secToDuration")
 
 // update profile
 exports.updateProfile = async (req, res) => {
@@ -88,6 +87,7 @@ exports.deleteAccount = async (req, res) => {
 exports.getUserByID = async (req, res) => {
     try {
         const user_id = req.user.id;
+        console.log(user_id)
         const userDetails = await User.findById(user_id).populate("profile").populate("courses").exec();
         return res.status(200).json({
             success: true,
@@ -110,6 +110,8 @@ exports.updateUserImage = async (req, res) => {
         // Getting user details
         const user_id = req.user.id;
         const image = req.files.displayPicture;
+        console.log(user_id)
+        console.log(image)
 
         // Fetching User data and Validating
         const user = await User.findById(user_id);
@@ -139,9 +141,7 @@ exports.updateUserImage = async (req, res) => {
         });
 
     } catch (error) {
-        if (!inProduction()) {
         console.log(error)
-        }
         return res.status(500).json({
             success: false,
             message: error.message,

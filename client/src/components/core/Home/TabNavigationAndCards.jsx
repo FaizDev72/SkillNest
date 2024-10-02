@@ -11,10 +11,12 @@ const TabNavigationAndCards = () => {
     function setCard(value) {
         setCurrentTab(value);
         let result = HomePageExplore.filter((ele) => ele.tag === value);
+        console.log(result)
         setCurrentCard(result[0].courses[0])
         setCurrentCourses(result[0].courses)
     }
 
+    // console.log("currentCard", currentCard, "\ncurrentCourse", currentCourse, "\ncurrentTab", currentTab)
     return (
         <div className='mx-auto relative flex flex-col gap-3 items-center justify-center my-8 '>
             <div className='text-4xl font-semibold text-center mt-10 text-white'>

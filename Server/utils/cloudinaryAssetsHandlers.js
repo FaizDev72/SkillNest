@@ -20,6 +20,7 @@ exports.destoryImageFromCloudinary = async (public_id) => {
             resource_type: "auto",
         }
         const result = await cloudinary.uploader.destroy(public_id, options);
+        console.log('Asset destroyed:', result);
     } catch (error) {
         console.error('Error destroying asset:', error);
     }

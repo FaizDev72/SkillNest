@@ -4,7 +4,6 @@ import { getEnrolledCourses } from '../../../services/operations/profileAPIs';
 import ScaleLoader from "react-spinners/ScaleLoader";
 import { useNavigate } from 'react-router-dom';
 import ProgressBar from "@ramonak/react-progress-bar";
-import isProduction from '../../../utils/logger';
 
 const EnrolledCourses = () => {
   const [enrolledCourses, setEnrolledCourses] = useState(null);
@@ -17,9 +16,7 @@ const EnrolledCourses = () => {
         // let publicCourses = response.filter((ele) => ele.status === 'published')
         setEnrolledCourses(response.data.data)
       } catch (error) {
-        if (!isProduction()) {
         console.log("Failed to fetch Enrolled Courses")
-      }
       }
     })()
   }, [])

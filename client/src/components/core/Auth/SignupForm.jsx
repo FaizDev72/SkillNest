@@ -35,6 +35,8 @@ const SignupForm = () => {
     function formSubmitHandler(e) {
         e.preventDefault();
         if (password !== confirm_password) {
+            console.log("password ", password)
+            console.log("confirm_password ", confirm_password)
             toast.error("Passwords Do Not Match");
             return;
         }
@@ -44,6 +46,7 @@ const SignupForm = () => {
             account_type
         }
         dispatch(setSignupData(signupData))
+        // console.log("printing 44444444444444444", data)
         dispatch(sendOTP(formData.email, navigate))
 
     }

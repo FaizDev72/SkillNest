@@ -8,7 +8,6 @@ const courseRouter = require('./routers/courseRouter')
 const cookieParser = require('cookie-parser');
 const cors = require('cors'); //backened entertain the front request
 const fileUpload = require('express-fileupload');
-const inProduction = require('./utils/logger');
 const app = express();
 const PORT = process.env.PORT || 4000
 require('dotenv').config();
@@ -48,7 +47,6 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-    if (!inProduction()) {
-    console.log(`Listening to Port no. ${PORT}`)}
+    console.log(`Listening to Port no. ${PORT}`)
 })
 

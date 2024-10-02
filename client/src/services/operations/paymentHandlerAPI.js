@@ -3,7 +3,6 @@ import { toast } from "react-hot-toast";
 import { apiConnector } from "../apiConnector";
 import { paymentsEndpoints } from "../apis";
 import { resetCart } from "../../components/redux/slice/cartSlice";
-import isProduction from "../../utils/logger";
 
 function loadScript(src) {
     return new Promise((resolve) => {
@@ -25,6 +24,7 @@ function loadScript(src) {
 
 export const buyCourse = async (courses, token, user, dispatch, navigate) => {
     const toast_id = toast.loading("Loading")
+    console.log(courses, token, user)
     try {
         const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js")
         if (!res) {
@@ -33,11 +33,13 @@ export const buyCourse = async (courses, token, user, dispatch, navigate) => {
             )
             return
         }
+        console.log("Token in buyCourse ->> ", token)
         const orderResponse = await apiConnector("POST", paymentsEndpoints.CAPTUREPAYMENT_API, { courses, }, { Authorization: `Bearer ${token}` })
 
         if (!orderResponse.data.success) {
             throw new Error(orderResponse.data.message)
         }
+        console.log("PAYMENT RESPONSE FROM BACKEND............", orderResponse.data)
 
         // open razarpay sdk
         const options = {
@@ -63,13 +65,11 @@ export const buyCourse = async (courses, token, user, dispatch, navigate) => {
         paymentObject.open();
         paymentObject.on("payment.failed", function (response) {
             toast.error("Oops! Payment Failed.")
-            if (!isProduction()) {
-            console.log(response.error)}
+            console.log(response.error)
         })
 
     } catch (error) {
-        if (!isProduction()) {
-        console.log("PAYMENT API ERROR............", error)}
+        console.log("PAYMENT API ERROR............", error)
         toast.error("Could Not make Payment.")
     }
     toast.dismiss(toast_id)
@@ -77,10 +77,12 @@ export const buyCourse = async (courses, token, user, dispatch, navigate) => {
 
 // Verify Payment   
 async function verifySignture(bodyData, token, navigate, dispatch) {
+    console.log("Token in verifySignture ->> ", token)
     const toast_id = toast.loading("Loading")
     try {
         const response = await apiConnector("POST", paymentsEndpoints.VERIFYSIGNATURE_API, { bodyData, }, { Authorization: `Bearer ${token}` })
 
+        console.log("VERIFY PAYMENT RESPONSE FROM BACKEND............", response)
         if (!response.data.success) {
             throw new Error(response.data.message)
         }
@@ -88,8 +90,7 @@ async function verifySignture(bodyData, token, navigate, dispatch) {
         navigate("/dashboard/enrolled-courses")
         dispatch(resetCart())
     } catch (error) {
-        if (!isProduction()) {
-        console.log("PAYMENT VERIFY ERROR............", error)}
+        console.log("PAYMENT VERIFY ERROR............", error)
         toast.error("Could Not Verify Payment.")
     }
     toast.dismiss(toast_id)
@@ -97,6 +98,7 @@ async function verifySignture(bodyData, token, navigate, dispatch) {
 
 // Send Payment Success Email
 async function paymentSuccessEmail(response, amount, token) {
+    console.log("Token in paymentSuccessEmail ->> ", token)
     try {
         await apiConnector("POST", paymentsEndpoints.PAYMENTSUCCESSEMAIL_API, {
             order_id: response.razorpay_order_id,
@@ -104,7 +106,6 @@ async function paymentSuccessEmail(response, amount, token) {
             amount,
         }, { Authorization: `Bearer ${token}` })
     } catch (error) {
-        if (!isProduction()) {
-        console.log("PAYMENT SUCCESS EMAIL ERROR............", error)}
+        console.log("PAYMENT SUCCESS EMAIL ERROR............", error)
     }
 }

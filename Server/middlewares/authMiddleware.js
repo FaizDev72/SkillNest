@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const inProduction = require('../utils/logger');
 require('dotenv').config();
 
 // Authentication Middleware
@@ -7,6 +6,7 @@ exports.auth = (req, res, next) => {
     try {
         // get details from body or header or cookies
         const token = req.body.token || req.cookies.token || req.header("Authorization").replace("Bearer ", "");
+        console.log("Token ->>> ",token)
 
         // validate
         if (!token) {
@@ -18,9 +18,7 @@ exports.auth = (req, res, next) => {
             const payload = jwt.verify(token, process.env.ENCRYPTING_KEY);
             req.user = payload;
         } catch (error) {
-            if (!inProduction()) {
             console.log("Invalid token:", error.message);
-            }
             return res.status(401).json({
                 success: false,
                 message: "Token is invalid",
@@ -31,9 +29,7 @@ exports.auth = (req, res, next) => {
         next();
 
     } catch (error) {
-        if (!inProduction()) {
         console.log("Authorization error:", error.message);
-        }
         return res.status(500).json({
             success: false,
             message: "Failed to authorize user",
@@ -47,9 +43,7 @@ exports.isStudent = (req, res, next) => {
     try {
         const account_type = req.user.account_type;
         if (account_type != "student") {
-            if (!inProduction()) {
             console.log("User is not a student");
-            }
             return res.status(403).json({
                 success: false,
                 message: "This is a protected route for students",
@@ -57,9 +51,7 @@ exports.isStudent = (req, res, next) => {
         }
         next()
     } catch (error) {
-        if (!inProduction()) {
         console.log("Authorization error for student route:", error.message);
-        }
         return res.status(500).json({
             success: false,
             message: "Failed to authorize for student route",
@@ -73,9 +65,7 @@ exports.isInstructor = (req, res, next) => {
     try {
         const account_type = req.user.account_type;
         if (account_type != "instructor") {
-            if (!inProduction()) {
             console.log("User is not a instructor");
-            }
             return res.status(403).json({
                 success: false,
                 message: "This is a protected route for instructor",
@@ -83,9 +73,7 @@ exports.isInstructor = (req, res, next) => {
         }
         next()
     } catch (error) {
-        if (!inProduction()) {
         console.log("Authorization error for instructor route:", error.message);
-        }
         return res.status(500).json({
             success: false,
             message: "Failed to authorize for instructor route",
@@ -99,9 +87,7 @@ exports.isAdmin = (req, res, next) => {
     try {
         const account_type = req.user.account_type;
         if (account_type != "admin") {
-            if (!inProduction()) {
             console.log("User is not a admin");
-            }
             return res.status(403).json({
                 success: false,
                 message: "This is a protected route for admin",
@@ -109,9 +95,7 @@ exports.isAdmin = (req, res, next) => {
         }
         next()
     } catch (error) {
-        if (!inProduction()) {
         console.log("Authorization error for admin route:", error.message);
-        }
         return res.status(500).json({
             success: false,
             message: "Failed to authorize for admin route",

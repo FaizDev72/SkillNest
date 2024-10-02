@@ -8,7 +8,6 @@ import { apiConnector } from '../../services/apiConnector'
 import { categoriesApi } from '../../services/apis'
 import ProfileDropDown from '../core/Auth/ProfileDropDown'
 import { AiOutlineShoppingCart } from "react-icons/ai";
-import isProduction from '../../utils/logger'
 
 const Navbar = () => {
     const location = useLocation();
@@ -21,10 +20,9 @@ const Navbar = () => {
         try {
             const response = await apiConnector("GET", categoriesApi.GETALLCATEGORIES_API);
             setSubLinks(response.data.data)
+            // console.log(response.data.data)
         } catch (error) {
-            if (!isProduction()) {
             console.log(error)
-            }
         }
     }
 
