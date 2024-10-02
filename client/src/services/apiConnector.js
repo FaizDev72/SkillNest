@@ -1,4 +1,5 @@
 import axios from 'axios';
+import isProduction from '../utils/logger';
 
 const axiosInstance = axios.create({});
 
@@ -11,10 +12,11 @@ export const apiConnector = async (method, url, bodyData, headers, params) => {
             headers: headers || null,
             params: params || null,
         });
-        console.log("API CONNECTOR RESPONSE:", response);  // Log the response
         return response;
     } catch (error) {
-        console.log("API CONNECTOR ERROR:", error);  // Log any errors
+        if (!isProduction()) {
+            console.log("API CONNECTOR ERROR:", error);  // Log any errors in development
+        }
         throw error;
     }
 };

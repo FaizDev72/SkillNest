@@ -26,10 +26,8 @@ const ChangeProfilePicture = () => {
     }
 
     function handleFileChange(event) {
-        // console.log(event.target.files[0])
         const file = event.target.files[0];
         if (file) {
-            console.log(file, "Printing File")
             setImageFile(file);
             previewFile(file);
         }
@@ -37,15 +35,11 @@ const ChangeProfilePicture = () => {
     }
 
     function uploadFileHandler() {
-        // console.log(imageFile, " Printing Image File")
-        // console.log(previewSource, " Printing previewFile")
         try {
             setLoading(true)
-            console.log(user, "printing user before")
             const formData = new FormData();
             formData.append('displayPicture', imageFile);
             dispatch(updateDisplayPicture(formData, token)).then(() => setLoading(false))
-            console.log(user, "printing user after")
         } catch (error) {
 
         }       

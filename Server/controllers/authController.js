@@ -7,6 +7,7 @@ const { sendMail } = require('../utils/sendMail')
 require('dotenv').config();
 const bcrypt = require('bcrypt')
 const { passwordUpdated } = require('../mail/templates/passwordUpdate')
+const inProduction = require('../utils/logger')
 
 exports.sendOtp = async (req, res) => {
     try {
@@ -37,7 +38,6 @@ exports.sendOtp = async (req, res) => {
             lowerCaseAlphabets: false,
             specialChars: false
         })
-        console.log(otp)
 
         otpList = await User.find({ otp })
         let flag = true;
@@ -59,7 +59,6 @@ exports.sendOtp = async (req, res) => {
             otp,
         })
 
-        // console.log(otpDetails)
 
         // Return response 
         return res.status(200).json({
@@ -68,7 +67,9 @@ exports.sendOtp = async (req, res) => {
             otp
         })
     } catch (error) {
+        if (!inProduction()) {
         console.log(error);
+    }
         return res.status(500).json({
             success: false,
             message: error.message,
@@ -80,7 +81,6 @@ exports.signup = async (req, res) => {
     try {
         // Getting request data from body
         let { first_name, last_name, email, password, confirm_password, otp, account_type } = req.body;
-        console.log({ first_name, last_name, email, password, confirm_password, otp, account_type })
 
         // Validating the Data
         if (!first_name || !last_name || !email || !password || !confirm_password || !otp) {
@@ -110,7 +110,6 @@ exports.signup = async (req, res) => {
 
         // Get lastest form db 
         const lastestOtp = await OTP.find({ email }).sort({ created_at: -1 }).limit(1);
-        console.log(lastestOtp)
 
         if (lastestOtp[0].otp != otp) {
             return res.status(400).json({
@@ -153,7 +152,9 @@ exports.signup = async (req, res) => {
             message: 'User Registered Successfully',
         })
     } catch (error) {
+        if (!inProduction()) {
         console.log(error);
+        }
         return res.status(500).json({
             success: false,
             message: 'User Cannot be Registered, Please Try Again.'
@@ -186,7 +187,6 @@ exports.login = async (req, res) => {
 
         // compare password
         if (await bcrypt.compare(password, user.password)) {
-            console.log(user)
             // create jwt token
             const payload = {
                 email: user.email,
@@ -207,7 +207,6 @@ exports.login = async (req, res) => {
             }
 
             // return response
-            console.log({ email, password })
             return res.cookie("token", token, options).status(200).json({
                 success: true,
                 token,
@@ -222,7 +221,9 @@ exports.login = async (req, res) => {
         }
 
     } catch (error) {
+        if (!inProduction()) {
         console.log(error);
+        }
         //Return 500 Internal Server Error status code with error message
         return res.status(500).json({
             success: false,

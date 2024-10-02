@@ -18,8 +18,6 @@ const VerifyEmail = () => {
         e.preventDefault();
 
         const { first_name, last_name, email, password, account_type, confirm_password } = signupData;
-        console.log("Verify Email ", signupData, otp)
-        console.log("printing OTP", otp)
         dispatch(signUp(first_name, last_name, email, password, confirm_password, account_type, navigate, otp));
     }
 

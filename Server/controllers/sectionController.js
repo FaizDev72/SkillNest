@@ -1,13 +1,13 @@
 const Section = require("../models/Section");
 const SubSection = require("../models/SubSection");
 const Course = require("../models/Course");
+const inProduction = require("../utils/logger");
 
 // Create Section
 exports.createSection = async (req, res) => {
     try {
         // Fetching Data 
         const { section_name, course_id } = req.body;
-        console.log({ section_name, course_id })
 
         // Validating Data
         if (!section_name || !course_id) {
@@ -51,7 +51,6 @@ exports.updateSection = async (req, res) => {
     try {
         // Getting data from requesting
         const { section_name, section_id, course_id } = req.body;
-        console.log(section_name, section_id)
 
         // Validating Data
         if (!section_name || !section_id || !course_id) {
@@ -129,7 +128,9 @@ exports.deleteSection = async (req, res) => {
         });
 
     } catch (error) {
+        if (!inProduction()) {
         console.log("Error while deleting section", error);
+        }
         return res.status(500).json({
             success: false,
             message: 'Unable to delete Section, please try again',

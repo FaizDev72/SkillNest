@@ -3,7 +3,6 @@ import {HiUsers} from 'react-icons/hi'
 import {ImTree} from 'react-icons/im'
 
 const CourseCard = ({ currentCard, setCurrentCard, cardData }) => {
-    // console.log(cardData)
     return (
         <div className={`w-[30%] flex flex-col gap-4 justify-between item-center ${currentCard === cardData ? "bg-white shadow-[12px_12px_0_0] shadow-yellow-50" : "bg-richblack-800"} cursor-pointer`} onClick={()=>setCurrentCard(cardData)}>
             <div className='pb-14 px-6 pt-6 border-dashed border-b-2'>

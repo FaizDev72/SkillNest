@@ -1,13 +1,13 @@
 const User = require('../models/User')
 const crypto = require('crypto');
 const bcrypt = require('bcrypt')
-const { sendMail } = require('../utils/sendMail')
+const { sendMail } = require('../utils/sendMail');
+const inProduction = require('../utils/logger');
 
 exports.resetPasswordToken = async (req, res) => {
     try {
         // Getting data from request body
         const { email } = req.body;
-        console.log(email)
 
         // Validate Data
         if (!email) {
@@ -46,7 +46,9 @@ exports.resetPasswordToken = async (req, res) => {
                 message: 'Email sent successfully, Please Check Your Email To Continue Further',
             });
         } catch (error) {
+            if (!inProduction()) {
             console.log(error);
+            }
             return res.status(500).json({
                 success: false,
                 message: 'Failed to update user token'
@@ -54,7 +56,9 @@ exports.resetPasswordToken = async (req, res) => {
         }
 
     } catch (error) {
+        if (!inProduction()) {
         console.log(error);
+        }
         return res.status(500).json({
             success: false,
             message: 'Something Went Wrong While Sending Reset Mail'
@@ -67,7 +71,6 @@ exports.resetPassword = async (req, res) => {
     try {
         // getting details
         const { token, password, confirm_password } = req.body;
-        console.log({ token, password, confirm_password })
 
         // validate
         if (!token || !password || !confirm_password) {
@@ -112,7 +115,9 @@ exports.resetPassword = async (req, res) => {
             message: `Password Updated Successfully`
         });
     } catch (error) {
+        if (!inProduction()) {
         console.log(error);
+        }
         return res.status(500).json({
             success: false,
             message: `Error occurred while updating password`

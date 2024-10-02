@@ -34,7 +34,6 @@ const CourseBuilderForm = () => {
   }
 
   async function onSubmitHandler(data) {
-    // console.log(data)
     let result;
     setLoading(true)
 
@@ -55,8 +54,6 @@ const CourseBuilderForm = () => {
       dispatch(setCourse(result))
       setValue("section_name", "")
       setEditSectionId(null)
-      // console.log("Course ", course)
-      // console.log("result->>> ", result?.data?.data)
     }
     setLoading(false)
   }
@@ -74,7 +71,6 @@ const CourseBuilderForm = () => {
   }
 
   function goBack() {
-    console.log(1)
     dispatch(setStep(1))
     dispatch(setEditCourse(true));
   }

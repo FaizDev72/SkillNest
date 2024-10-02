@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Course = require("../models/Course");
 const RatingAndReview = require("../models/RatingAndReview");
+const inProduction = require('../utils/logger');
 
 // create Rating
 exports.createRating = async (req, res) => {
@@ -71,7 +72,9 @@ exports.createRating = async (req, res) => {
         });
 
     } catch (error) {
+        if (!inProduction()) {
         console.log(error);
+        }
         return res.status(500).json({
             success: false,
             message: 'Internal server error',
@@ -84,11 +87,9 @@ exports.createRating = async (req, res) => {
 exports.getAverageRating = async (req, res) => {
     try {
         const { course_id } = req.body;
-        console.log(course_id, "course_id");
 
         // Step 1: Check with a simple find query
         const findResult = await RatingAndReview.find({ course_id: new mongoose.Types.ObjectId(course_id) });
-        console.log(findResult, "find result");
 
         // Step 2: If documents exist, perform the aggregation
         if (findResult.length > 0) {
@@ -107,7 +108,6 @@ exports.getAverageRating = async (req, res) => {
             ]);
 
             // Log the aggregation result
-            console.log(result, "aggregation result");
 
             // Return the average rating
             if (result.length > 0) {
@@ -126,7 +126,9 @@ exports.getAverageRating = async (req, res) => {
         });
 
     } catch (error) {
+        if (!inProduction()) {
         console.log(error);
+        }
         return res.status(500).json({
             success: false,
             message: error.message
@@ -157,7 +159,9 @@ exports.getAllRatingReview = async (req, res) => {
             data: allRatingReview,
         });
     } catch (error) {
+        if (!inProduction()) {
         console.log(error);
+        }
         return res.status(500).json({
             success: false,
             message: error.message
