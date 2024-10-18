@@ -34,6 +34,7 @@ function App() {
       {/* <div className="w-11/12 mx-auto overflow-hidden"> */}
       <Routes>
         <Route path='/' element={<Home />} />
+        <Route path="/about" element={<About />} />
         <Route path='/catalog/:catalog_name' element={<Category />} />
 
         <Route path="/login" element={
